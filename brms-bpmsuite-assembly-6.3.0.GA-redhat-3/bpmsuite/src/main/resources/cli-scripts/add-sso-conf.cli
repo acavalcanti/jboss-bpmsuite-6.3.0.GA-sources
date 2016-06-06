@@ -1,0 +1,1 @@
+/subsystem=web/virtual-server=default-host/sso=configuration:add()

@@ -1,0 +1,2 @@
+/subsystem=ejb3:write-attribute(name="default-resource-adapter-name", value="hornetq-ra")
+/subsystem=ejb3:write-attribute(name=default-mdb-instance-pool, value="mdb-strict-max-pool")

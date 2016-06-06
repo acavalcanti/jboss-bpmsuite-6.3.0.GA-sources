@@ -1,0 +1,168 @@
+<!--
+  ~ JBoss, Home of Professional Open Source
+  ~ Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
+  ~ as indicated by the @author tags. All rights reserved.
+  ~ See the copyright.txt in the distribution for a
+  ~ full listing of individual contributors.
+  ~
+  ~ This copyrighted material is made available to anyone wishing to use,
+  ~ modify, copy, or redistribute it subject to the terms and conditions
+  ~ of the GNU Lesser General Public License, v. 2.1.
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT A
+  ~ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+  ~ PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+  ~ You should have received a copy of the GNU Lesser General Public License,
+  ~ v.2.1 along with this distribution; if not, write to the Free Software
+  ~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+  ~ MA  02110-1301, USA.
+  -->
+
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    <id>supplementary-tools</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <baseDirectory>jboss-brms-bpmsuite-${project.version.short}-supplementary-tools</baseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>${supplementary-tools.staging.dir}/helix-core-${version.helix}</directory>
+            <outputDirectory>/helix-core</outputDirectory>
+            <excludes>
+              <exclude>**/*.sh</exclude>
+              <exclude>**/jline/**</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${supplementary-tools.staging.dir}/helix-core-${version.helix}</directory>
+            <outputDirectory>/helix-core</outputDirectory>
+             <includes>
+              <include>**/*.sh</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>${supplementary-tools.staging.dir}/zookeeper-${version.zookeeper}</directory>
+            <outputDirectory>/zookeeper</outputDirectory>
+            <excludes>
+              <exclude>**/*.sh</exclude>
+              <exclude>**/commons-collections*.jar</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${supplementary-tools.staging.dir}/zookeeper-${version.zookeeper}</directory>
+            <outputDirectory>/zookeeper</outputDirectory>
+             <includes>
+              <include>**/*.sh</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>${supplementary-tools.staging.dir}/kie-config-cli-${version.org.kie}-dist</directory>
+            <outputDirectory>/kie-config-cli-dist</outputDirectory>
+            <excludes>
+              <exclude>**/*.sh</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${supplementary-tools.staging.dir}/kie-config-cli-${version.org.kie}-dist</directory>
+            <outputDirectory>/kie-config-cli-dist</outputDirectory>
+             <includes>
+              <include>**/*.sh</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.build.directory}/jbpm-installer/db/ddl-scripts</directory>
+            <outputDirectory>ddl-scripts</outputDirectory>
+             <includes>
+              <include>db2/*.sql</include>
+              <include>h2/*.sql</include>
+              <include>mysql5/*.sql</include>
+              <include>mysqlinnodb/*.sql</include>
+              <include>postgresql/*.sql</include>
+              <include>oracle/*.sql</include>
+              <include>sqlserver/*.sql</include>
+              <include>sybase/*.sql</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.build.directory}/jbpm-installer/db/upgrade-scripts</directory>
+            <outputDirectory>upgrade-scripts</outputDirectory>
+             <includes>
+              <include>db2/bpms-*.sql</include>
+              <include>h2/bpms-*.sql</include>
+              <include>mysql5/bpms-*.sql</include>
+              <include>mysqlinnodb/bpms-*.sql</include>
+              <include>postgresql/bpms-*.sql</include>
+              <include>oracle/bpms-*.sql</include>
+              <include>sqlserver/bpms-*.sql</include>
+              <include>sybase/bpms-*.sql</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+    </fileSets> 
+    
+    <files>
+      <!--Fix commons-collections security bug-->
+      <file>
+         <source>${project.build.directory}/commons-collections-${version.commons-collections}.jar</source>
+         <destName>zookeeper/lib/commons-collections-${version.commons-collections}.jar</destName>
+         <fileMode>0644</fileMode>
+      </file>
+
+      <!--Fix jline security bug-->
+      <file>
+         <source>${project.build.directory}/jline-0.9.94-redhat-0.jar</source>
+         <destName>helix-core/repo/jline/jline/0.9.94/jline-0.9.94.jar</destName>
+         <fileMode>0644</fileMode>
+      </file>
+      <file>
+         <source>${project.build.directory}/jline-0.9.94-redhat-0.jar</source>
+         <destName>zookeeper/lib/jline-0.9.94.jar</destName>
+         <fileMode>0644</fileMode>
+      </file>
+      <!--Add dashboard-builder db schema into ddl-scriptss -->
+      <file>
+         <source>${dashbuilder-generic.staging.dir}/WEB-INF/etc/sql/1-create-db2.sql</source>
+         <destName>ddl-scripts/db2/db2-dashbuilder-schema.sql</destName>
+         <fileMode>0644</fileMode>
+      </file>
+      <file>
+         <source>${dashbuilder-generic.staging.dir}/WEB-INF/etc/sql/1-create-h2.sql</source>
+         <destName>ddl-scripts/h2/h2-dashbuilder-schema.sql</destName>
+         <fileMode>0644</fileMode>
+      </file>
+      <file>
+         <source>${dashbuilder-generic.staging.dir}/WEB-INF/etc/sql/1-create-mysql.sql</source>
+         <destName>ddl-scripts/mysql5/mysql5-dashbuilder-schema.sql</destName>
+         <fileMode>0644</fileMode>
+      </file>
+      <file>
+         <source>${dashbuilder-generic.staging.dir}/WEB-INF/etc/sql/1-create-oracle.sql</source>
+         <destName>ddl-scripts/oracle/oracle-dashbuilder-schema.sql</destName>
+         <fileMode>0644</fileMode>
+      </file>
+      <file>
+         <source>${dashbuilder-generic.staging.dir}/WEB-INF/etc/sql/1-create-postgres.sql</source>
+         <destName>ddl-scripts/postgresql/postgres-dashbuilder-schema.sql</destName>
+         <fileMode>0644</fileMode>
+      </file>
+      <file>
+         <source>${dashbuilder-generic.staging.dir}/WEB-INF/etc/sql/1-create-sqlserver.sql</source>
+         <destName>ddl-scripts/sqlserver/sqlserver-dashbuilder-schema.sql</destName>
+         <fileMode>0644</fileMode>
+      </file>
+      <file>
+         <source>${dashbuilder-generic.staging.dir}/WEB-INF/etc/sql/1-create-sybase.sql</source>
+         <destName>ddl-scripts/sybase/sybase-dashbuilder-schema.sql</destName>
+         <fileMode>0644</fileMode>
+      </file>
+    </files>
+</assembly>

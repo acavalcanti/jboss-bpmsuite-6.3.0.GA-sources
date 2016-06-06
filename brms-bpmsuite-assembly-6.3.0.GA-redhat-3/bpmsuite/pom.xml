@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ JBoss, Home of Professional Open Source.
+  ~ Copyright 2013, Red Hat, Inc., and individual contributors
+  ~ as indicated by the @author tags. See the copyright.txt file in the
+  ~ distribution for a full listing of individual contributors.
+  ~
+  ~ This is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU Lesser General Public License as
+  ~ published by the Free Software Foundation; either version 2.1 of
+  ~ the License, or (at your option) any later version.
+  ~
+  ~ This software is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this software; if not, write to the Free
+  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jboss.ip</groupId>
+        <artifactId>brms-bpmsuite-assembly</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <relativePath>../</relativePath>
+    </parent>
+
+    <name>Integration Platform BPMSuite Distribution</name>
+    <artifactId>jboss-bpmsuite</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <engine.staging.dir>${project.build.directory}/bpms-engine</engine.staging.dir>
+        <wb-generic.staging.dir>${project.build.directory}/ki-wb-generic.war</wb-generic.staging.dir>
+        <dashbuilder-generic.staging.dir>${project.build.directory}/dashbuilder-generic.war</dashbuilder-generic.staging.dir>
+        <wb-eap.staging.dir>${project.build.directory}/kie-wb.war</wb-eap.staging.dir>
+        <jd-eap.staging.dir>${project.build.directory}/jbpm-dashboard-eap.war</jd-eap.staging.dir>
+        <wb-weblogic.staging.dir>${project.build.directory}/ki-wb-weblogic.war</wb-weblogic.staging.dir>
+        <dashbuilder-weblogic.staging.dir>${project.build.directory}/dashbuilder-weblogic.war</dashbuilder-weblogic.staging.dir>
+        <kie-server-ee6.staging.dir>${project.build.directory}/kie-server-ee6.war</kie-server-ee6.staging.dir>
+        <kie-server-webc.staging.dir>${project.build.directory}/kie-server-webc.war</kie-server-webc.staging.dir>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>get-webapp</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <!-- BPMS runtime   -->
+                                <artifactItem>
+                                    <groupId>org.drools</groupId>
+                                    <artifactId>droolsjbpm-bpms-distribution</artifactId>
+                                    <version>${version.org.kie}</version>
+                                    <classifier>bin</classifier>
+                                    <type>zip</type>
+                                    <outputDirectory>${engine.staging.dir}</outputDirectory>
+                                </artifactItem>
+                                                                
+                                <!-- Tomcat distribution   -->
+                                <artifactItem>
+                                    <groupId>org.kie</groupId>
+                                    <artifactId>kie-wb-distribution-wars</artifactId>
+                                    <version>${version.org.kie}</version>
+                                    <classifier>tomcat7-redhat</classifier>
+                                    <type>war</type>
+                                    <outputDirectory>${wb-generic.staging.dir}</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.jbpm.dashboard</groupId>
+                                    <artifactId>jbpm-dashboard-distributions</artifactId>
+                                    <version>${version.org.kie}</version>
+                                    <classifier>tomcat7-redhat</classifier>
+                                    <type>war</type>
+                                    <outputDirectory>${dashbuilder-generic.staging.dir}</outputDirectory>
+                                </artifactItem>                                
+                                <artifactItem><!-- BPMS Execution Server for tomcat--> 
+                                  <groupId>org.kie.server</groupId>
+                                  <artifactId>kie-server</artifactId>
+                                  <version>${version.org.kie}</version>
+                                  <type>war</type>
+                                  <classifier>webc</classifier>
+                                  <outputDirectory>${kie-server-webc.staging.dir}</outputDirectory>
+                                </artifactItem>
+                                
+                                <!-- EAP distribution -->
+                                <artifactItem>
+                                    <groupId>org.kie</groupId>
+                                    <artifactId>kie-wb-distribution-wars</artifactId>
+                                    <version>${version.org.kie}</version>
+				                            <classifier>eap6_4-redhat</classifier>
+                                    <type>war</type>
+                                    <outputDirectory>${wb-eap.staging.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem><!-- Dashboard builder for EAP 6.1 -->
+				                          <groupId>org.jbpm.dashboard</groupId>
+                        				  <artifactId>jbpm-dashboard-distributions</artifactId>
+                        				  <version>${version.org.kie}</version>
+                        				  <type>war</type>
+                        				  <classifier>eap6_4-redhat</classifier>
+                                  <outputDirectory>${jd-eap.staging.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem><!-- BPMS Execution Server for eap, weblogic-->
+                                  <groupId>org.kie.server</groupId>
+                                  <artifactId>kie-server</artifactId>
+                                  <version>${version.org.kie}</version>
+                                  <type>war</type>
+                                  <classifier>ee6</classifier>
+                                  <outputDirectory>${kie-server-ee6.staging.dir}</outputDirectory>
+                                </artifactItem>
+                                
+                                <!-- For weblogic distributions -->
+                                <artifactItem>
+                                  <groupId>org.kie</groupId>
+                                  <artifactId>kie-wb-distribution-wars</artifactId>
+                                  <version>${version.org.kie}</version>
+                                  <classifier>weblogic12-redhat</classifier>
+                                  <type>war</type>
+                                  <outputDirectory>${wb-weblogic.staging.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                  <groupId>org.jbpm.dashboard</groupId>
+                                  <artifactId>jbpm-dashboard-distributions</artifactId>
+                                  <version>${version.org.kie}</version>
+                                  <classifier>weblogic12-redhat</classifier>
+                                  <type>war</type>
+                                  <outputDirectory>${dashbuilder-weblogic.staging.dir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    
+                    <!-- For Websphere distributions -->
+                    <execution>
+                      <id>copy</id>
+                      <phase>generate-sources</phase>
+                      <goals>
+                        <goal>copy</goal>
+                      </goals>
+                      <configuration>
+                        <artifactItems>
+                          <artifactItem>
+                            <groupId>org.kie</groupId>
+                            <artifactId>kie-wb-distribution-wars</artifactId>
+                            <version>${version.org.kie}</version>
+                            <classifier>was8-redhat</classifier>
+                            <type>war</type>
+                            <outputDirectory>${project.build.directory}/was8/</outputDirectory>
+                            <destFileName>business-central.war</destFileName>
+                          </artifactItem>
+                          <artifactItem>
+                            <groupId>org.jbpm.dashboard</groupId>
+                            <artifactId>jbpm-dashboard-distributions</artifactId>
+                            <version>${version.org.kie}</version>
+                            <classifier>was8-redhat</classifier>
+                            <type>war</type>
+                            <outputDirectory>${project.build.directory}/was8/</outputDirectory>
+                            <destFileName>dashbuilder.war</destFileName>
+                          </artifactItem>
+                          <artifactItem><!-- BPMS Execution Server for websphere(unexploded) -->
+                           <groupId>org.kie.server</groupId>
+                           <artifactId>kie-server</artifactId>
+                           <version>${version.org.kie}</version>
+                           <type>war</type>
+                           <classifier>ee6</classifier>
+                           <outputDirectory>${project.build.directory}/was8/</outputDirectory>
+                           <destFileName>kie-server.war</destFileName>
+                          </artifactItem>
+
+                          <artifactItem><!-- Tomcat integration jar -->
+                           <groupId>org.kie</groupId>
+                           <artifactId>kie-tomcat-integration</artifactId>
+                           <version>${version.org.kie}</version>
+                           <type>jar</type>
+                           <overWrite>false</overWrite>
+                           <outputDirectory>${project.build.directory}/addon-jar</outputDirectory>
+                          </artifactItem>
+                          
+                          <artifactItem><!-- To fix 1204229 -->
+                            <groupId>org.guvnor</groupId>
+                            <artifactId>guvnor-rest-client</artifactId>
+                            <version>${version.org.kie}</version>
+                            <type>jar</type>
+                            <overWrite>false</overWrite>
+                            <outputDirectory>${project.build.directory}/addon-jar</outputDirectory>
+                          </artifactItem>
+                        </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <transformationSets>
+                        <transformationSet>
+                            <dir>${basedir}/../common/target/${eap.version}/standalone/configuration</dir>
+                            <outputDir>${project.build.directory}/eap6-conf/standalone/configuration</outputDir>
+                            <stylesheet>${basedir}/src/main/resources/add-system-properties.xsl</stylesheet>
+                            <includes>
+                                <include>standalone*.xml</include>
+                            </includes>
+                        </transformationSet>
+
+                        <transformationSet>
+                            <dir>${basedir}/../common/target/${eap.version}/domain/configuration</dir>
+                            <outputDir>${project.build.directory}/eap6-conf/domain/configuration</outputDir>
+                            <stylesheet>${basedir}/src/main/resources/add-system-properties-domain.xsl</stylesheet>
+                            <includes>
+                                <include>domain.xml</include>
+                            </includes>
+                        </transformationSet>
+
+                        <!-- Bug 977382 & Bug 977386  add BPMS MDB conf-->
+                        <transformationSet>
+                            <dir>${project.build.directory}/eap6-conf/standalone/configuration/</dir>
+                            <outputDir>${project.build.directory}/eap6-conf/standalone/configuration</outputDir>
+                            <stylesheet>${basedir}/src/main/resources/add-mdb-conf.xsl</stylesheet>
+                            <includes>
+                                <include>standalone.xml</include>
+                                <include>standalone-ha.xml</include>
+                                <include>standalone-osgi.xml</include>
+                            </includes>
+                        </transformationSet>
+
+                        <transformationSet>
+                            <dir>${project.build.directory}/eap6-conf/domain/configuration/</dir>
+                            <outputDir>${project.build.directory}/eap6-conf/domain/configuration</outputDir>
+                            <stylesheet>${basedir}/src/main/resources/add-mdb-conf-domain.xsl</stylesheet>
+                            <includes>
+                                <include>domain.xml</include>
+                            </includes>
+                        </transformationSet>
+
+                        <!-- Add sso on -->
+                        <transformationSet>
+                            <dir>${project.build.directory}/eap6-conf/standalone/configuration/</dir>
+                            <outputDir>${project.build.directory}/eap6-conf/standalone/configuration</outputDir>
+                            <stylesheet>${basedir}/src/main/resources/add-sso-conf.xsl</stylesheet>
+                            <includes>
+                                <include>standalone*.xml</include>
+                            </includes>
+                        </transformationSet>
+                        <transformationSet>
+                            <dir>${project.build.directory}/eap6-conf/domain/configuration/</dir>
+                            <outputDir>${project.build.directory}/eap6-conf/domain/configuration</outputDir>
+                            <stylesheet>${basedir}/src/main/resources/add-sso-conf.xsl</stylesheet>
+                            <includes>
+                                <include>domain.xml</include>
+                            </includes>
+                        </transformationSet>
+
+                        <!-- Add jms roles on standalone*.xml-->
+                        <transformationSet>
+                            <dir>${project.build.directory}/eap6-conf/standalone/configuration/</dir>
+                            <outputDir>${project.build.directory}/eap6-conf/standalone/configuration</outputDir>
+                            <stylesheet>${basedir}/src/main/resources/add-jms-roles.xsl</stylesheet>
+                            <includes>
+                                <include>standalone*.xml</include>
+                            </includes>
+                        </transformationSet>
+                        <transformationSet>
+                            <dir>${project.build.directory}/eap6-conf/domain/configuration/</dir>
+                            <outputDir>${project.build.directory}/eap6-conf/domain/configuration</outputDir>
+                            <stylesheet>${basedir}/src/main/resources/add-jms-roles.xsl</stylesheet>
+                            <includes>
+                                <include>domain.xml</include>
+                            </includes>
+                        </transformationSet>
+
+                        <!-- Formatting xml -->
+                        <transformationSet>
+                            <dir>${project.build.directory}/eap6-conf/standalone/configuration/</dir>
+                            <outputDir>${project.build.directory}/eap6-conf/standalone/configuration</outputDir>
+                            <stylesheet>${basedir}/src/main/resources/pretty-print.xsl</stylesheet>
+                            <includes>
+                                <include>standalone*.xml</include>
+                            </includes>
+                        </transformationSet>
+                        <transformationSet>
+                            <dir>${project.build.directory}/eap6-conf/domain/configuration/</dir>
+                            <outputDir>${project.build.directory}/eap6-conf/domain/configuration</outputDir>
+                            <stylesheet>${basedir}/src/main/resources/pretty-print.xsl</stylesheet>
+                            <includes>
+                                <include>domain.xml</include>
+                            </includes>
+                        </transformationSet>
+                    </transformationSets>
+                </configuration>
+
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>                    
+                    <execution>
+                        <id>bpms-eap-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>jboss-bpmsuite-${project.version}</finalName>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <appendAssemblyId>true</appendAssemblyId>
+                            <attach>true</attach>
+                            <descriptors>
+                                <descriptor>${basedir}/src/main/assembly/bpms-engine.zip.xml</descriptor>
+                                <descriptor>${basedir}/src/main/assembly/bpms-generic-deployable.zip.xml</descriptor>
+                                <descriptor>${basedir}/src/main/assembly/bpms-eap6.zip.xml</descriptor>
+                                <descriptor>${basedir}/src/main/assembly/bpms-was8-deployable.zip.xml</descriptor>
+                                <descriptor>${basedir}/src/main/assembly/bpms-wls-deployable.zip.xml</descriptor>
+                                <descriptor>${basedir}/src/main/assembly/bpms-eap6-installer.zip.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

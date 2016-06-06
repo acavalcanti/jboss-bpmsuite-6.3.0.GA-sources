@@ -1,0 +1,5 @@
+/profile=default/subsystem=messaging/hornetq-server=default/security-setting=#/role=admin:add(send=true,consume=true,create-non-durable-queue=true,delete-non-durable-queue=true)
+/profile=full/subsystem=messaging/hornetq-server=default/security-setting=#/role=admin:add(send=true,consume=true,create-non-durable-queue=true,delete-non-durable-queue=true)
+/profile=ha/subsystem=messaging/hornetq-server=default/security-setting=#/role=admin:add(send=true,consume=true,create-non-durable-queue=true,delete-non-durable-queue=true)
+/profile=full-ha/subsystem=messaging/hornetq-server=default/security-setting=#/role=admin:add(send=true,consume=true,create-non-durable-queue=true,delete-non-durable-queue=true)
+

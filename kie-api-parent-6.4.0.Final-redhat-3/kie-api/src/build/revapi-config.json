@@ -1,0 +1,47 @@
+{
+  "revapi" : {
+    "ignore" : [
+      {
+        "code" : "java.method.addedToInterface",
+        "new" : "method org.kie.api.runtime.KieSessionConfiguration org.kie.api.runtime.KieContainer::getKieSessionConfiguration()",
+        "justification" : "Enables retrieving the default session configuration directly from KieContainer."
+      },
+      {
+        "code" : "java.method.addedToInterface",
+        "new" : "method org.kie.api.runtime.KieSessionConfiguration org.kie.api.runtime.KieContainer::getKieSessionConfiguration(java.lang.String)",
+        "justification" : "Enables retrieving the named session configuration directly from KieContainer."
+      },
+      {
+        "code" : "java.method.addedToInterface",
+        "new" : "method org.kie.api.builder.model.KieBaseModel org.kie.api.builder.model.KieSessionModel::getKieBaseModel()",
+        "justification" : "Enables retrieving the KieBaseModel from a KieSessionModel."
+      },
+      {
+        "code" : "java.method.addedToInterface",
+        "new" : "method org.kie.api.builder.model.KieBaseModel org.kie.api.runtime.KieContainer::getKieBaseModel(java.lang.String)",
+        "justification" : "Enables retrieving the named KieBaseModel directly from KieContainer."
+      },
+      {
+        "code" : "java.method.addedToInterface",
+        "new" : "method org.kie.api.builder.model.KieSessionModel org.kie.api.runtime.KieContainer::getKieSessionModel(java.lang.String)",
+        "justification" : "Enables retrieving the named KieSessionModel directly from KieContainer."
+      },
+      {
+        "code" : "java.method.addedToInterface",
+        "new" : "method org.kie.api.logger.KieRuntimeLogger org.kie.api.logger.KieLoggers::newFileLogger(org.kie.api.event.KieRuntimeEventManager, java.lang.String, int)",
+        "justification" : "Allows to configure maxEventsInMemory in FileLogger."
+      },
+      {
+        "code" : "java.method.addedToInterface",
+        "new" : "method void org.kie.api.runtime.rule.EntryPoint::delete(org.kie.api.runtime.rule.FactHandle, org.kie.api.runtime.rule.FactHandle.State)",
+        "justification" : "Allows to state if the FactHandle has to be removed as an explicitly asserted fact, from the Truth Maintenance System or both."
+      },
+      {
+        "code": "java.method.parameterTypeChanged",
+        "old": "method parameter void org.kie.api.runtime.ClassObjectFilter::<init>(===java.lang.Class===)",
+        "new": "method parameter void org.kie.api.runtime.ClassObjectFilter::<init>(===java.lang.Class<?>===)",
+        "justification": "Using generics is generally preferable."
+      }
+    ]
+  }
+}

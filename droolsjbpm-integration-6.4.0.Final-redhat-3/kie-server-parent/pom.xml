@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.drools</groupId>
+    <artifactId>droolsjbpm-integration</artifactId>
+    <version>6.4.0.Final-redhat-3</version>
+  </parent>
+
+  <groupId>org.kie.server</groupId>
+  <artifactId>kie-server-parent</artifactId>
+  <packaging>pom</packaging>
+
+  <name>KIE :: Execution Server</name>
+  <description>KIE Execution Server</description>
+
+  <modules>
+    <module>kie-server-remote</module>
+    <module>kie-server-services</module>
+    <module>kie-server-api</module>
+    <module>kie-server-wars</module>
+    <module>kie-server-controller</module>
+    <module>kie-server-tests</module>
+  </modules>
+
+ <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-api</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-services-common</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-services-drools</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-services-jbpm</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-services-optaplanner</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+
+      <!-- kie server remote --> 
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-remote</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-client</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+
+      <!-- jms -->
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-jms</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+
+      <!-- rest -->
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-rest</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-rest-common</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-rest-drools</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-rest-jbpm</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-rest-optaplanner</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+
+      <!-- ws -->
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-ws</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+
+      <!-- controller -->
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-controller-api</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-controller-impl</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+
+      <!-- wars -->
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+        <classifier>webc</classifier>
+        <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+        <classifier>ee6</classifier>
+        <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+        <classifier>ee7</classifier>
+        <type>war</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-integ-tests-common</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
+</project>

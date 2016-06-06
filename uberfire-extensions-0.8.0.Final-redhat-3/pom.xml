@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2015 JBoss, by Red Hat, Inc
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.uberfire</groupId>
+    <artifactId>uberfire-parent-metadata</artifactId>
+    <!-- Keep in sync with property <version.org.uberfire> declared in uberfire-extensions-deps -->
+    <version>0.8.0.Final-redhat-3</version>
+  </parent>
+
+  <artifactId>uberfire-extensions</artifactId>
+  <packaging>pom</packaging>
+  <version>0.8.0.Final-redhat-3</version>
+
+  <name>Extensions to UberFire</name>
+
+  <modules>
+    <module>uberfire-extensions-deps</module>
+    <module>uberfire-extensions-bom</module>
+    <module>uberfire-security</module>
+    <module>uberfire-metadata</module>
+    <module>uberfire-widgets</module>
+    <module>uberfire-commons-editor</module>
+    <module>uberfire-runtime-plugins</module>
+    <module>uberfire-wires</module> 
+    <module>uberfire-apps</module>
+    <module>uberfire-layout-editor</module>
+    <module>uberfire-simple-docks</module>
+  </modules>
+
+  <properties>
+    <version.org.jboss.errai.cdi10-compatible>3.0.6.Final-redhat-1</version.org.jboss.errai.cdi10-compatible>
+    <version.org.mvel>2.2.8.Final-redhat-1</version.org.mvel>
+    <version.fuse.eap>6.2.1.redhat-084</version.fuse.eap>
+    <version.org.kie>6.4.0.Final-redhat-3</version.org.kie>
+    <version.org.uberfire>0.8.0.Final-redhat-3</version.org.uberfire>
+    <version.org.jboss.as>7.5.7.Final-redhat-3</version.org.jboss.as>
+    <version.org.kie.workbench.app>6.3.0.GA</version.org.kie.workbench.app>
+    <version.org.jboss.bom.brms>6.3.0.GA-redhat-3</version.org.jboss.bom.brms>
+    <version.org.uberfire.ext>0.8.0.Final-redhat-3</version.org.uberfire.ext>
+    <version.org.dashbuilder>0.4.0.Final-redhat-3</version.org.dashbuilder>
+    <version.org.jboss.errai>3.2.3.Final-redhat-1</version.org.jboss.errai>
+    <version.org.jboss.integration-platform>6.0.6.Final-redhat-1</version.org.jboss.integration-platform>
+    <jboss.dist.version>7.5.7.Final-redhat-3</jboss.dist.version>
+  </properties>
+
+  <dependencyManagement></dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>project-sources-maven-plugin</artifactId>
+        <version>0.3</version>
+        <executions>
+          <execution>
+            <id>project-sources-archive</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>archive</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+<!--
+Modified by POM Manipulation Extension for Maven 1.17 ( SHA: 89482a03 ) 
+-->
+

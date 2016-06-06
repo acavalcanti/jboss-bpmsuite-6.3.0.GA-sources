@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+    <artifactId>patching-tools-parent</artifactId>
+    <version>6.3.0.GA-redhat-3</version>
+  </parent>
+
+  <artifactId>integration-tests</artifactId>
+
+  <name>JBoss BRMS and BPM Suite Patching Tools Integration Tests</name>
+
+  <properties>
+    <!-- Starting distribution properties - starting distribution is distribution
+         from which is testing distribution cloned. It's a base image for testing distributions.
+         During test execution, testing distribution is cloned from starting distribution and patched. -->
+    <!-- Artifact ID of maven artifact that represents distribution that is being patched. -->
+    <startdist.artifactid>jboss-brms</startdist.artifactid>
+    <!-- Version of maven artifact that represents distribution that is being patched. -->
+    <startdist.version>${version.brms-bpmsuite.previous.release}</startdist.version>
+    <!-- Directory within workspace directory that contains starting distribution.
+         For workspace directory property see maven-failsafe-plugin configuration in this pom. -->
+    <startdist.dir>startdist</startdist.dir>
+    <!-- Starting distribution type. This value is passed to patch tool as argument. -->
+    <startdist.type>eap6.x</startdist.type>
+
+    <!-- Classifier of maven artifact that represents distribution that is being patched and final distribution. -->
+    <dist.classifier>deployable-eap6.x</dist.classifier>
+
+    <!-- Destined distribution properties - destined distribution is a distribution that
+         represents final distribution after patching process. It's used as a reference distribution in
+         comparison with patched testing distribution. -->
+    <destdist.version>${version.brms-bpmsuite.latest.release}</destdist.version>
+    <!-- Directory within workspace directory that contains destined distribution.
+         For workspace directory property see maven-failsafe-plugin configuration in this pom. -->
+    <destdist.dir>destdist</destdist.dir>
+
+    <!-- Patch tool properties. -->
+    <!-- URL containing patch tool zip bundle. -->
+    <brms.patchtool.url>file://${project.basedir}/../patch-distributions/jboss-brms/target/jboss-brms-${version.brms-bpmsuite.latest.patch.user.facing}-patch.zip</brms.patchtool.url>
+    <bpmsuite.patchtool.url>file://${project.basedir}/../patch-distributions/jboss-bpmsuite/target/jboss-bpmsuite-${version.brms-bpmsuite.latest.patch.user.facing}-patch.zip</bpmsuite.patchtool.url>
+    <!-- By default use the BRMS patch zip -->
+    <patchtool.url>${brms.patchtool.url}</patchtool.url>
+    <!-- Directory within workspace directory that contains unzipped patchtool bundle. -->
+    <patchtool.unzipped.dir>patchtool</patchtool.unzipped.dir>
+    <!-- Directory within unzipped patchtool bundle that contains distribution backups. -->
+    <patchtool.backup.dir>backup</patchtool.backup.dir>
+    <!-- Directory within unzipped patchtool bundle that contains updates of distributions. -->
+    <patchtool.updates.dir>updates</patchtool.updates.dir>
+    <!-- Pattern which matches patch tool bundle root directory name.
+         Used when searching for specific blacklists. -->
+    <patchtool.root.dir.pattern>jboss*patch</patchtool.root.dir.pattern>
+    <!-- Name of main patch tool *nix script. -->
+    <patchtool.script.applypatch.shell>apply-updates.sh</patchtool.script.applypatch.shell>
+    <!-- Name of main patch tool Windows script. -->
+    <patchtool.script.applypatch.batch>apply-updates.bat</patchtool.script.applypatch.batch>
+    <!-- Filename of the blacklist file. Should be in root patch tool directory. -->
+    <patchtool.list.blacklist>blacklist.txt</patchtool.list.blacklist>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-distributions</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.jboss.ip</groupId>
+                  <artifactId>${startdist.artifactid}</artifactId>
+                  <version>${startdist.version}</version>
+                  <classifier>${dist.classifier}</classifier>
+                  <type>zip</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${project.build.testOutputDirectory}/${startdist.dir}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jboss.ip</groupId>
+                  <artifactId>${startdist.artifactid}</artifactId>
+                  <version>${destdist.version}</version>
+                  <classifier>${dist.classifier}</classifier>
+                  <type>zip</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${project.build.testOutputDirectory}/${destdist.dir}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.googlecode.maven-download-plugin</groupId>
+        <artifactId>download-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>download-and-unpack-patch-distro</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>wget</goal>
+            </goals>
+            <configuration>
+              <url>${patchtool.url}</url>
+              <unpack>true</unpack>
+              <outputDirectory>${project.build.testOutputDirectory}/${patchtool.unzipped.dir}</outputDirectory>
+              <cacheDirectory>${project.build.testOutputDirectory}/.download-maven-plugin-cache</cacheDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <workspace.dir.path>${project.build.testOutputDirectory}</workspace.dir.path>
+            <startdist.dir>${startdist.dir}</startdist.dir>
+            <startdist.type>${startdist.type}</startdist.type>
+            <destdist.dir>${destdist.dir}</destdist.dir>
+            <patchtool.unzipped.dir>${patchtool.unzipped.dir}</patchtool.unzipped.dir>
+            <patchtool.backup.dir>${patchtool.backup.dir}</patchtool.backup.dir>
+            <patchtool.updates.dir>${patchtool.updates.dir}</patchtool.updates.dir>
+            <patchtool.root.dir.pattern>${patchtool.root.dir.pattern}</patchtool.root.dir.pattern>
+            <patchtool.script.applypatch.shell>${patchtool.script.applypatch.shell}</patchtool.script.applypatch.shell>
+            <patchtool.script.applypatch.batch>${patchtool.script.applypatch.batch}</patchtool.script.applypatch.batch>
+            <patchtool.list.blacklist>${patchtool.list.blacklist}</patchtool.list.blacklist>
+          </systemPropertyVariables>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <!-- Profiles enable very easy test execution with different distributions.
+       Examples: "mvn clean verify -Pbrms,eap6.x", "mvn clean verify -Pbpmsuite,generic", "mvn clean verify -Pplanner-engine" -->
+  <profiles>
+    <profile>
+      <id>brms</id>
+      <properties>
+        <startdist.artifactid>jboss-brms</startdist.artifactid>
+        <patchtool.url>${brms.patchtool.url}</patchtool.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>bpmsuite</id>
+      <properties>
+        <startdist.artifactid>jboss-bpmsuite</startdist.artifactid>
+        <patchtool.url>${bpmsuite.patchtool.url}</patchtool.url>
+      </properties>
+    </profile>
+    <!-- EAP deployable-->
+    <profile>
+      <id>eap6.x</id>
+      <properties>
+        <startdist.type>eap6.x</startdist.type>
+        <dist.classifier>deployable-eap6.x</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>eap6.x-bc</id>
+      <properties>
+        <startdist.type>eap6.x-bc</startdist.type>
+        <dist.classifier>deployable-eap6.x</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>eap6.x-kie-server</id>
+      <properties>
+        <startdist.type>eap6.x-kie-server</startdist.type>
+        <dist.classifier>deployable-eap6.x</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>eap6.x-dashbuilder</id>
+      <properties>
+        <startdist.type>eap6.x-dashbuilder</startdist.type>
+        <dist.classifier>deployable-eap6.x</dist.classifier>
+      </properties>
+    </profile>
+    <!-- Generic deployable -->
+    <profile>
+      <id>generic</id>
+      <properties>
+        <startdist.type>generic</startdist.type>
+        <dist.classifier>deployable-generic</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>generic-bc</id>
+      <properties>
+        <startdist.type>generic-bc</startdist.type>
+        <dist.classifier>deployable-generic</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>generic-kie-server</id>
+      <properties>
+        <startdist.type>generic-kie-server</startdist.type>
+        <dist.classifier>deployable-generic</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>generic-dashbuilder</id>
+      <properties>
+        <startdist.type>generic-dashbuilder</startdist.type>
+        <dist.classifier>deployable-generic</dist.classifier>
+      </properties>
+    </profile>
+    <!-- WebSphere deployable -->
+    <profile>
+      <id>was8</id>
+      <properties>
+        <startdist.type>was8</startdist.type>
+        <dist.classifier>deployable-was8</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>was8-bc</id>
+      <properties>
+        <startdist.type>was8-bc</startdist.type>
+        <dist.classifier>deployable-was8</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>was8-kie-server</id>
+      <properties>
+        <startdist.type>was8-kie-server</startdist.type>
+        <dist.classifier>deployable-was8</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>was8-dashbuilder</id>
+      <properties>
+        <startdist.type>was8-dashbuilder</startdist.type>
+        <dist.classifier>deployable-was8</dist.classifier>
+      </properties>
+    </profile>
+    <!-- Weblogic deployable -->
+    <profile>
+      <id>wls12c</id>
+      <properties>
+        <startdist.type>wls12c</startdist.type>
+        <dist.classifier>deployable-wls12c</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>wls12c-bc</id>
+      <properties>
+        <startdist.type>wls12c-bc</startdist.type>
+        <dist.classifier>deployable-wls12c</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>wls12c-kie-server</id>
+      <properties>
+        <startdist.type>wls12c-kie-server</startdist.type>
+        <dist.classifier>deployable-wls12c</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>wls12c-dashbuilder</id>
+      <properties>
+        <startdist.type>wls12c-dashbuilder</startdist.type>
+        <dist.classifier>deployable-wls12c</dist.classifier>
+      </properties>
+    </profile>
+    <!-- Other distributions -->
+    <profile>
+      <id>planner-engine</id>
+      <properties>
+        <startdist.artifactid>jboss-brms-bpmsuite</startdist.artifactid>
+        <startdist.type>planner-engine</startdist.type>
+        <dist.classifier>planner-engine</dist.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>supplementary-tools</id>
+      <properties>
+        <startdist.artifactid>jboss-brms-bpmsuite</startdist.artifactid>
+        <startdist.type>supplementary-tools</startdist.type>
+        <dist.classifier>supplementary-tools</dist.classifier>
+      </properties>
+    </profile>
+  </profiles>
+</project>

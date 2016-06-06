@@ -1,0 +1,542 @@
+<?xml version="1.0"?>
+<!--
+     This xml is used to store any configs for userInput
+
+     You might notice that there is no text in the fields and validators.
+     That's because all the text have been moved to eng/fra/etc .xml·
+     for consistency sake
+
+    Note: the langpacks are found in:
+    jbossas-installer/installer/eap-config/local-izpack/bin/langpacks/installer
+-->
+
+<userInput> 
+    <!-- Security Panel --> 
+    <panel order="0"> 
+        <field type="title" align="center" bold="true" size="2" id="security.title" />
+        <field type="staticText" align="left"
+                id="security.text"/>
+        <field type="space"/>
+        <field type="staticText" align="left" id="security.password.warning"/>
+
+    <!-- The default admin username/password -->
+        <field type="space"/>
+        <field type="radio" variable="addUser" tooltip="UserInputPanel.tooltip.quickstarts" 
+            conditionid="!eap.needs.install">
+            <description id="add.user.text" align="left"/>
+            <spec revalidate="yes">
+                <choice id="add.user.choice.no" value="false" set="true"  revalidate="yes"/>
+                <choice id="add.user.choice.yes" value="true" revalidate="yes"/>
+            </spec>
+        </field>
+        
+        <field type="text" variable="adminUser" tooltip="UserInputPanel.tooltip.adminUser" 
+            conditionid="add.user|eap.needs.install">
+            <spec id="username.text" size="16" set="admin" />
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="username.nameerror" ></validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="username.alphanumeric">
+                <param name="pattern" value="^[a-zA-Z0-9@,./=\\]*$"/>
+            </validator>
+        </field>
+        <field type="space"/>
+        <field type="password" variable="adminPassword"  defaultFocus="true" tooltip="security.password.warning" 
+            conditionid="add.user|eap.needs.install" summarize="false" autoPrompt="true">
+            <spec>
+                <pwd id="username.password.text" size="16" />
+                <pwd id="username.password.re.text" size="16" />
+            </spec>
+            <validator class="com.redhat.installer.installation.validator.CompareIdataVariablesValidator" id="username.password.match">
+                <param name="value" value="adminUser" />
+                <param name="operation" value="!="/>
+            </validator>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="username.no.password" ></validator>
+            <validator class="com.izforge.izpack.util.PasswordEqualityValidator" id="username.no.match.password"></validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="password.min.eight.chars">
+                <param name="pattern" value=".{8,}"/>
+            </validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="password.at.least.one.digit">
+                <param name="pattern" value=".*[0-9].*"/>
+            </validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="password.at.least.one.alpha">
+                <param name="pattern" value=".*[a-zA-Z].*"/>
+            </validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="password.at.least.one.non.alphanum">
+                <param name="pattern" value=".*[^a-zA-Z0-9].*"/>
+            </validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="password.banned.characters">
+                <param name="pattern" value="^[^&amp;]*$"/>
+            </validator>
+        </field>
+    </panel>
+
+    <!-- BPMS User credentials -->
+    <panel order="1">
+        <field type="title" align="center" bold="true" size="1.75" id="brms.title" />
+        <field type="staticText" align="left" id="brms.text" />
+        <field type="space"/>
+        <field type="staticText" align="left" id="security.password.warning"/>
+        <field type="space"/>
+         <field type="text" variable="brms.user">
+            <spec id="brms.username.text" size="16" set="brmsAdmin" />
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="username.nameerror" ></validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="username.alphanumeric">
+                <param name="pattern" value="^[a-zA-Z0-9@,./=\\]*$"/>
+            </validator>
+            <validator class="com.redhat.installer.installation.validator.BlackListValidator" id="brms.username.not.admin">
+                <param name="blacklist" value="admin,analyst,user,manager,developer"/>
+            </validator>
+        </field>
+        <field type="space"/>
+        <field type="password" variable="brms.password" defaultFocus="true" summarize="false" tooltip="security.password.warning" autoPrompt="true">
+            <spec>
+                <pwd id="brms.password.text" size="16" set=""/>
+                <pwd id="brms.password.re.text" size="16" set=""/>
+            </spec>
+            <validator class="com.redhat.installer.installation.validator.CompareIdataVariablesValidator" id="username.password.match">
+                <param name="value" value="brms.user" />
+                <param name="operation" value="!="/>
+            </validator>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="username.no.password" ></validator>
+            <validator class="com.izforge.izpack.util.PasswordEqualityValidator" id="username.no.match.password"></validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="password.min.eight.chars">
+                <param name="pattern" value=".{8,}"/>
+            </validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="password.at.least.one.digit">
+                <param name="pattern" value=".*[0-9].*"/>
+            </validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="password.at.least.one.alpha">
+                <param name="pattern" value=".*[a-zA-Z].*"/>
+            </validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="password.at.least.one.non.alphanum">
+                <param name="pattern" value=".*[^a-zA-Z0-9].*"/>
+            </validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="password.banned.characters">
+                <param name="pattern" value="^[^&amp;]*$"/>
+            </validator>
+        </field>
+    </panel>
+
+	<!-- java security manager questions -->
+    <panel order="2">
+        <field type="title" align="center" id="jvm.security.title" bold="true" size="2"/>
+        <field type="staticText" align="left" id="jvm.security.text"/>
+        <field type="space"/>
+        <field type="staticText" align="left" id="jvm.security.text2"/>
+        <field type="space"/>
+        <field type="staticText" align="left" id="jvm.security.text3"/>
+        <field type="space"/>
+        <field type="staticText" align="left" id="jvm.security.text4"/>
+        <field type="check" variable="jvm.security.enabled" defaultFocus="true">
+            <spec id="jvm.security.question" true="true" false="false" set="false"/>
+        </field>
+    </panel>
+
+    <panel order="3">
+        <field type="title" align="center" id="pureIPv6.title" bold="true" size="2"/>
+        <field type="space"/>
+        <field type="staticText" align="left" id="pureIPv6.text"/>
+        <field type="check" variable="pureIPv6" tooltip="UserInputPanel.tooltip.pureIPv6">
+            <spec id="pureIPv6.choice.yes" true="true" false="false"/>
+        </field>
+    </panel>
+    <!-- ask if the user wants to configure the container after the install for profile or for domain -->
+    <panel order="4">
+    <field type="title" align="center" id="postinstall.title" bold="true" size="2"/>
+    <field type="radio" variable="postinstallServer" defaultFocus="true">
+        <description id="config.server.text"/>
+        <spec revalidate="yes">
+        <choice id="config.choice.no" value="false" set="true" revalidate="yes"/>
+        <choice id="config.choice.yes" value="true" revalidate="yes"/>
+        </spec>
+        </field>
+    <field type="space"/>
+        <field type="check" variable="installVault" conditionid="postinstall.server+!vault.preexisting" tooltip="UserInputPanel.tooltip.installVault">
+            <spec id="vault.choice.yes" true="true" false="false" />
+        </field>
+        <field type="check" variable="installSsl" conditionid="postinstall.server" tooltip="UserInputPanel.tooltip.installSsl">
+            <spec id="ssl.choice.yes" true="true" false="false" />
+        </field>
+	<field type="check" variable="ldapMgmtConsole" conditionid="postinstall.server" tooltip="UserInputPanel.tooltip.ldapMgmtConsole">
+	    <spec id="ldap.mgmt.console.choice" true="true" false="false"/>
+	</field>
+	<field type="check" variable="ldapBusinessCentral" conditionid="postinstall.server" tooltip="UserInputPanel.tooltip.ldapBusinessCentral">
+	    <spec id="ldap.businesscentral.choice" true="true" false="false"/>
+	</field>
+    <field type="check" variable="installSecurityDomain" conditionid="postinstall.server" tooltip="UserInputPanel.tooltip.installSecurityDomain">
+        <spec id="securitydomain.choice.yes" true="true" false="false"/>
+    </field>
+    <field type="check" variable="installClusterDemo" conditionid="postinstall.server" tooltip="UserInputPanel.tooltip.installClusterDemo">
+        <spec id="cluster.demo" true="true" false="false"/>
+    </field>
+        <field type="check" variable="installBusinessCentralDatasource" conditionid="postinstall.server" tooltip="UserInputPanel.tooltip.installJdbcDriver" >
+            <spec id="JBossJDBCBusinessCentralDatasourceSetupPanel.choice.yes" true="true" false="false" />
+        </field>
+        <field type="check" variable="configure.optaplanner" conditionid="postinstall.server" tooltip="UserInputPanel.tooltip.disableOptaplanner" >
+            <spec id="optaplanner.choice.yes" true="true" false="false"/>
+        </field>
+    </panel>
+ <!-- password vault -->
+   <panel order="5">
+    <field type="title" align="center" id="vault.title" bold="true" size="2"/>
+    <field type="staticText" align="left" id="vault.text"/>
+    <field type="space"/>
+	<field type="staticText" align="left" id="vault.text2"/>
+	<field type="space"/>
+        <field type="staticText" align="left" id="keystore.password.warning"/>
+	<field type="space"/>
+        <field type="text" variable="vault.alias" tooltip="vault.alias.tooltip">
+            <spec id="vault.alias.text" size="16" set="${vault.alias}"/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="vault.ic.error" ></validator>
+        </field>
+        <field type="rule" variable="vault.salt" tooltip="vault.salt.tooltip">
+            <spec id="vault.salt.text" size="16" layout="O:15:8" set="0:${vault.salt}" resultFormat="plainString"/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="vault.ic.error" ></validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="vault.salt.not.eight.chars">
+                <param name="pattern" value=".{8}"/>
+            </validator>
+        </field>
+        <field type="text" variable="vault.itercount" tooltip="vault.itercount.tooltip" >
+            <spec id="vault.itercount.text" size="16" set="${vault.itercount}"/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="vault.ic.error" ></validator>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="vault.itercount.numeric">
+                <param name="pattern" value="\d*[1-9]\d*"/>
+            </validator>
+        </field>
+        <field type="password" variable="vault.keystorepwd" tooltip="vault.password.tooltip" summarize="false" defaultFocus="true" autoPrompt="true">
+        <spec>
+        <pwd id="vault.password.text" size="16"/>
+        <pwd id="vault.password.re.text" size="16"/>
+        </spec>
+        <validator class="com.izforge.izpack.util.NotEmptyValidator" id="vault.no.password"/>
+        <validator class="com.izforge.izpack.util.PasswordEqualityValidator" id="username.no.match.password"/>
+            <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="password.min.six.chars">
+                <param name="pattern" value=".{6,}"/>
+            </validator>
+    </field>
+	<field type="staticText" align="left" id="vault.path.text" tooltip="vault.path.tooltip"/>
+    <field type="file" align="left" variable="vault.keystoreloc" tooltip="vault.path.tooltip">
+            <spec size="44" set="${vault.keystoreloc}" prefX="500" mustExist="false"/>
+            <validator class="com.redhat.installer.installation.validator.DirectoryValidator" id="vault.keystore.invalid.path"/>
+    </field>
+	<field type="staticText" align="left" id="vault.encrdir.text" conditionid="install.vault" tooltip="vault.encrdir.tooltip"/>
+    <field type="dir" align="left" variable="vault.encrdir" tooltip="vault.encrdir.tooltip">
+            <spec size="44" set="${vault.encrdir}" prefX="500" mustExist="false"/>
+            <validator class="com.redhat.installer.installation.validator.DirectoryValidator" id="vault.encrdir.invalid.path"/>
+            <validator class="com.redhat.installer.installation.validator.WritablePathValidator" id="vault.encrdir.notwritable" ></validator>
+            <validator class="com.redhat.installer.installation.validator.IsDirectoryValidator" id="vault.encrdir.not.directory" ></validator>
+	</field>
+    </panel>
+    
+    <!-- panel with preexisting vault -->
+    <panel order="6">
+	<field type="title" align="center" id="vault.title" bold="true" size="2"/>
+	<field type="staticText" align="left" id="vault.text.preexisting"/>
+	<field type="space"/>
+        <field type="password" variable="vault.keystorepwd" tooltip="vault.password.tooltip" summarize="false" defaultFocus="true" autoPrompt="true">
+	    <spec>
+		<pwd id="vault.password.text" size="16"/>
+		<pwd id="vault.password.re.text" size="16"/>
+	    </spec>
+	    <validator class="com.izforge.izpack.util.NotEmptyValidator" id="vault.no.password"/>
+	    <validator class="com.izforge.izpack.util.PasswordEqualityValidator" id="username.no.match.password"/>
+        </field>
+    </panel>
+
+    <!-- The SSL security info gathering stuff -->
+    <panel order="7">
+    <field type="title" align="center" id="ssl.title" bold="true" size="2"/>
+    <field type="staticText" align="left" id="ssl.text"/>
+    <field type="space"/>
+	<field type="password" variable="ssl.password" tooltip="ssl.password.tooltip" summarize="false" defaultFocus="true" autoPrompt="true">
+        <spec>
+        <pwd id="ssl.password.text" size="16"/>
+        <pwd id="ssl.password.re.text" size="16"/>
+        </spec>
+        <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ssl.no.password"/>
+        <validator class="com.izforge.izpack.util.PasswordEqualityValidator" id="username.no.match.password"/>
+    </field>
+    <field type="staticText" align="left" id="ssl.path.text"/>
+        <field type="file" align="left" variable="ssl.path" tooltip="ssl.path.tooltip">
+            <spec size="34" set="${INSTALL_PATH}" prefX="400" mustExist="true"/>
+            <validator class="com.izforge.izpack.util.FileValidator" id="UserInputPanel.file.notfile.message"/>
+        </field>
+    </panel>
+    <!-- LDAP outbound connection information gathering -->
+    <panel order="8">
+    <field type="title" align="center" id="ldap.title" bold="true" size="2"/>
+    <field type="staticText" align="left" id="ldap.text"/>
+    <field type="space"/>
+    <field type="text" variable="ldap.name" tooltip="ldap.name.tooltip">
+        <spec id="ldap.name.text" size="25" set="ldap.connection"/>
+        <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.ic.error" ></validator>
+        <validator class="com.redhat.installer.layering.validator.LDAPConnectionNameValidator" id="ldap.name.clash"/>
+        <validator class="com.izforge.izpack.util.RegularExpressionValidator" id="ldap.name.no.spaces">
+            <param name="pattern" value="^\S+$"/>
+        </validator>
+    </field>
+    <field type="text" variable="ldap.url" tooltip="ldap.url.tooltip">
+            <spec id="ldap.url.text" size="25" set="ldap://127.0.0.1:389" />
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.ic.error" ></validator>
+    </field>
+    <field type="text" variable="ldap.dn" tooltip="ldap.dn.tooltip">
+            <spec id="ldap.dn.text" size="25" set="uid=admin,ou=system" />
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.ic.error" ></validator>
+    </field>
+        <field type="password" variable="ldap.password" tooltip="ldap.creds.tooltip" summarize="false" defaultFocus="true" autoPrompt="true">
+            <spec>
+                <pwd id="ldap.password.text" size="25" />
+                <pwd id="ldap.password.re.text" size="25" />
+            </spec>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.ic.error" ></validator>
+        <validator class="com.izforge.izpack.util.PasswordEqualityValidator" id="username.no.match.password"/>
+    </field>
+    <field type="button">
+        <spec id="Ldap.connection.test.button" msg="Ldap.connection.verified">
+            <!--Order matters as you want to check the connection first -->
+            <validator class="com.redhat.installer.asconfiguration.ldap.validator.LDAPValidator" id="Ldap.error"/>
+        </spec>
+    </field>
+    </panel>
+    <!-- LDAP security realm config -->
+    <panel order="9">
+    <field type="title" align="center" id="ldap.mgmt.console.title" bold="true" size="2"/>
+    <field type="staticText" align="left" id="ldap2.text"/>
+    <field type="space"/>
+    <field type="text" variable="ldap.realmname" tooltip="ldap.realmname.tooltip">
+            <spec id="ldap.realmname.text" size="25" set="ldap.security.realm"/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap2.ic.error"></validator>
+            <validator class="com.redhat.installer.layering.validator.LDAPRealmNameValidator" id="ldap.realmname.clash"/>
+    </field>
+    <field type="text" variable="ldap.basedn" tooltip="ldap.basedn.tooltip">
+            <spec id="ldap.basedn.text" size="25" set="dc=myCompany,dc=org"/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap2.ic.error"></validator>
+    </field>
+    <field type="combo" variable="ldap.filtertype" tooltip="ldap.filtertype.tooltip">
+        <description id="ldap.filtertype.text"/>
+        <spec>
+        <choice id="ldap.filtertype.attribute" value="username"/>
+        <choice id="ldap.filtertype.advanced" value="advanced"/>
+        </spec>
+    </field>
+    <field type="text" variable="ldap.filter" tooltip="ldap.filter.tooltip">
+        <spec id="ldap.filter.text" size="25" set="userName" />
+        <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap2.ic.error"></validator>
+    </field>
+    <field type="combo" variable="ldap.recursive" tooltip="ldap.recursive.tooltip">
+        <description id="ldap.recursive.text"/>
+        <spec>
+           <choice id="ldap.recursive.1" value="false" set="true"/>
+           <choice id="ldap.recursive.2" value="true"/>
+        </spec>
+    </field>
+    <field type="button">
+        <spec id="Ldap.user.test.button" msg="Ldap.user.verified">
+            <!--Order matters as you want to check the connection first -->
+            <validator class="com.redhat.installer.asconfiguration.ldap.validator.ManagementDnValidator" id="Ldap.error2"/>
+        </spec>
+    </field>
+    </panel>
+
+    <panel order="10">
+        <field type="title" align="center" id="ldap.businesscentral.title" bold="true" size="2"/>
+        <field type="staticText" align="left" id="ldap.businesscentral.description"/>
+        <field type="space"/>
+        <field type="text" variable="ldap.businesscentral.user.context" tooltip="ldap.businesscentral.user.context.tooltip">
+            <spec id="ldap.businesscentral.user.context.text" size="25" set=""/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.businesscentral.incomplete.error"/>
+        </field>
+        <field type="text" variable="ldap.businesscentral.user.filter" tooltip="ldap.businesscentral.user.filter.tooltip">
+            <spec id="ldap.businesscentral.user.filter.text" size="25" set="" />
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.businesscentral.incomplete.error"/>
+        </field>
+        <field type="text" variable="ldap.businesscentral.user.roles.context" tooltip="ldap.businesscentral.user.roles.context.tooltip">
+            <spec id="ldap.businesscentral.user.roles.context.text" size="25" set=""/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.businesscentral.incomplete.error"/>
+        </field>
+        <field type="text" variable="ldap.businesscentral.user.roles.filter" tooltip="ldap.businesscentral.user.roles.filter.tooltip">
+            <spec id="ldap.businesscentral.user.roles.filter.text" size="25" set="" />
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.businesscentral.incomplete.error"/>
+        </field>
+        <field type="text" variable="ldap.businesscentral.role.context" tooltip="ldap.businesscentral.role.context.tooltip">
+            <spec id="ldap.businesscentral.role.context.text" size="25" set=""/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.businesscentral.incomplete.error"/>
+        </field>
+        <field type="text" variable="ldap.businesscentral.role.filter" tooltip="ldap.businesscentral.role.filter.tooltip">
+            <spec id="ldap.businesscentral.role.filter.text" size="25" set=""/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.businesscentral.incomplete.error"/>
+        </field>
+        <field type="text" variable="ldap.businesscentral.role.attributeid" tooltip="ldap.businesscentral.role.attributeid.tooltip">
+            <spec id="ldap.businesscentral.role.attributeid.text" size="25" set=""/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.businesscentral.incomplete.error"/>
+        </field>
+        <field type="text" variable="ldap.businesscentral.role.nameid" tooltip="ldap.businesscentral.role.nameid.tooltip">
+            <spec id="ldap.businesscentral.role.nameid.text" size="25" set=""/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="ldap.businesscentral.incomplete.error"/>
+        </field>
+        <field type="check" variable="ldap.businesscentral.role.attr.dn" tooltip="ldap.businesscentral.role.attr.dn.tooltip">
+            <spec id="ldap.businesscentral.role.attr.dn.text" true="true" false="false" set="false"/>
+        </field>
+        <!--<field type="button">
+        <spec id="Ldap.bxms.user.test.button" msg="Ldap.bxms.user.verified">
+            <validator class="com.redhat.installer.asconfiguration.ldap.validator.BxmsLdapUserValidator" id="Ldap.error2"/>
+        </spec>
+    </field>
+    <field type="button">
+        <spec id="Ldap.bxms.role.test.button" msg="Ldap.bxms.role.verified">
+            <validator class="com.redhat.installer.asconfiguration.ldap.validator.BxmsLdapRoleValidator" id="Ldap.error2"/>
+        </spec>
+    </field>-->
+
+    </panel>
+    <!-- JSSE configuration -->
+    <panel order="11">
+        <field type="title" align="center" id="securitydomain.title" bold="true" size="2"/>
+        <field type="staticText" align="left" id="securitydomain.jsse.text"/>
+        <field type="check" variable="securityDomainAddJsse" indent="0">
+            <spec id="securitydomain.add.jsse.text" true="true" false="false" revalidate="yes"/>
+        </field>
+        <field type="text" variable="securitydomain.jsse.ciphersuites" conditionid="securitydomain.add.jsse" tooltip="securitydomain.jsse.ciphersuites.tooltip" indent="20">
+            <spec id="securitydomain.jsse.ciphersuites.text" size="30" set=""/>
+            <!-- validation here: cipher-suites element consists of a
+                 comma-separated list of simple terms. Thus, there can never be two commas in a row, or it will break! -->
+        </field>
+        <field type="text" variable="securitydomain.jsse.protocols" conditionid="securitydomain.add.jsse" tooltip="securitydomain.jsse.protocols.tooltip" indent="20">
+            <spec id="securitydomain.jsse.protocols.text" size="30" set=""/>
+            <!-- validation here: same as cipher suites. -->
+        </field>
+        <field type="text" variable="securitydomain.jsse.clientalias" conditionid="securitydomain.add.jsse" tooltip="securitydomain.jsse.clientalias.tooltip" indent="20">
+            <spec id="securitydomain.jsse.clientalias.text" size="16" set=""/>
+            <!-- validation to go here: single field, not sure what characters
+                 are allowed yet. probably similar to an xa property name -->
+        </field>
+        <field type="text" variable="securitydomain.jsse.serveralias" conditionid="securitydomain.add.jsse" tooltip="securitydomain.jsse.serveralias.tooltip" indent="20">
+            <spec id="securitydomain.jsse.serveralias.text" size="16" set=""/>
+            <!-- validation. same as client alias -->
+        </field>
+        <field type="combo" variable="securitydomain.jsse.authtoken" conditionid="securitydomain.add.jsse" tooltip="securitydomain.jsse.authtoken.tooltip" indent="20">
+            <description id="securitydomain.jsse.authtoken.text"/>
+            <spec>
+                <choice txt="True" value="true"/>
+                <choice txt="False" value="false" set="true"/>
+            </spec>
+        </field>
+        <!-- either this or a truststore must be defined for the JSSE element.
+             otherwise we have stacktraces upon server startup. so we start with this one displayed and
+             upon validation TODO: make this actually work? probably requires hackery in izpack-->
+        <field type="check" variable="securityDomainJsseAddKeystore" indent="20" conditionid="securitydomain.add.jsse">
+            <spec id="securitydomain.jsse.add.keystore.text" true="true" false="false" revalidate="yes" />
+        </field>
+        <!-- relevant keystore fields -->
+        <field type="password" variable="securitydomain.jsse.keystore.password" conditionid="securitydomain.add.jsse.and.keystore" indent="40" tooltip="securitydomain.jsse.keystore.password.tooltip" summarize="false" autoPrompt="true">
+            <spec>
+                <pwd id="securitydomain.jsse.keystore.password.text" size="16" />
+                <pwd id="securitydomain.jsse.keystore.password.re.text" size="16" />
+            </spec>
+            <!--<validator class="com.izforge.izpack.util.NotEmptyValidator" id="securitydomain.jsse.keystore.password.empty" ></validator>-->
+            <validator class="com.izforge.izpack.util.PasswordEqualityValidator" id="securitydomain.jsse.keystore.password.nomatch"></validator>
+        </field>
+        <field type="text" variable="securitydomain.jsse.keystore.provider" indent="40" conditionid="securitydomain.add.jsse.and.keystore" tooltip="securitydomain.jsse.keystore.provider.tooltip">
+            <spec id="securitydomain.jsse.keystore.provider.text" size="30" set=""/>
+        </field>
+        <field type="text" variable="securitydomain.jsse.keystore.providerargument" indent="40" conditionid="securitydomain.add.jsse.and.keystore" tooltip="securitydomain.jsse.keystore.providerargument.tooltip">
+            <spec id="securitydomain.jsse.keystore.providerargument.text" size="30" set=""/>
+        </field>
+        <field type="text" variable="securitydomain.jsse.keystore.type" indent="40" conditionid="securitydomain.add.jsse.and.keystore" tooltip="securitydomain.jsse.keystore.type.tooltip">
+            <spec id="securitydomain.jsse.keystore.type.text" size="16" set="JKS"/>
+        </field>
+        <!-- change to file perhaps? not exactly. can be a remote file.-->
+        <field type="text" variable="securitydomain.jsse.keystore.url" indent="40" conditionid="securitydomain.add.jsse.and.keystore" tooltip="securitydomain.jsse.keystore.url.tooltip">
+            <spec id="securitydomain.jsse.keystore.url.text" size="30" />
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="securitydomain.jsse.no.keystore.url" ></validator>
+        </field>
+
+        <!-- one cannot have a keystore manager without a keystore. only display the
+             add a keystore manager if a keystore is being added. -->
+        <field type="check" variable="securityDomainJsseAddKeystoreManager" indent="20" conditionid="securitydomain.add.jsse">
+            <spec id="securitydomain.jsse.add.keystoremanager.text" true="true" false="false" revalidate="yes" set="false"/>
+        </field>
+        <!-- relevant keystore-manager fields -->
+        <field type="text" variable="securitydomain.jsse.keystoremanager.algorithm" indent="40" conditionid="securitydomain.add.jsse.keystoremanager" tooltip="securitydomain.jsse.keystoremanager.algorithm.tooltip">
+            <spec id="securitydomain.jsse.keystoremanager.algorithm.text" size="30" set=""/>
+        </field>
+        <field type="text" variable="securitydomain.jsse.keystoremanager.provider" indent="40" conditionid="securitydomain.add.jsse.keystoremanager" tooltip="securitydomain.jsse.keystoremanager.provider.tooltip">
+            <spec id="securitydomain.jsse.keystoremanager.provider.text" size="30" set=""/>
+        </field>
+
+
+        <field type="check" variable="securityDomainJsseAddTruststore" indent="20" conditionid="securitydomain.add.jsse">
+            <spec id="securitydomain.jsse.add.truststore.text" true="true" false="false" revalidate="yes" set="false"/>
+        </field>
+        <!-- relevant truststore fields -->
+        <field type="password" variable="securitydomain.jsse.truststore.password" conditionid="securitydomain.add.jsse.and.truststore"
+               indent="40" tooltip="securitydomain.jsse.truststore.password.tooltip" summarize="false" autoPrompt="true">
+            <spec>
+                <pwd id="securitydomain.jsse.truststore.password.text" size="16" />
+                <pwd id="securitydomain.jsse.truststore.password.re.text" size="16" />
+            </spec>
+            <!--<validator class="com.izforge.izpack.util.NotEmptyValidator" id="securitydomain.jsse.truststore.password.empty" ></validator>-->
+            <validator class="com.izforge.izpack.util.PasswordEqualityValidator" id="securitydomain.jsse.truststore.password.nomatch"></validator>
+        </field>
+        <field type="text" variable="securitydomain.jsse.truststore.provider" indent="40" conditionid="securitydomain.add.jsse.and.truststore" tooltip="securitydomain.jsse.truststore.provider.tooltip">
+            <spec id="securitydomain.jsse.truststore.provider.text" size="30" set=""/>
+        </field>
+        <field type="text" variable="securitydomain.jsse.truststore.providerargument" indent="40" conditionid="securitydomain.add.jsse.and.truststore" tooltip="securitydomain.jsse.truststore.providerargument.tooltip">
+            <spec id="securitydomain.jsse.truststore.providerargument.text" size="30" set=""/>
+        </field>
+        <field type="text" variable="securitydomain.jsse.truststore.type" indent="40" conditionid="securitydomain.add.jsse.and.truststore" tooltip="securitydomain.jsse.truststore.type.tooltip">
+            <spec id="securitydomain.jsse.truststore.type.text" size="16" set="JKS"/>
+        </field>
+        <field type="text" variable="securitydomain.jsse.truststore.url" indent="40" conditionid="securitydomain.add.jsse.and.truststore" tooltip="securitydomain.jsse.truststore.url.tooltip">
+            <spec id="securitydomain.jsse.truststore.url.text" size="30" set=""/>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="securitydomain.jsse.no.truststore.url"></validator>
+        </field>
+
+        <!-- one cannot have a truststore manager without adding a truststore.
+             thus, this field depends upon a truststore being added TODO: this does not function as desired, so it has been reverted.-->
+        <field type="check" variable="securityDomainJsseAddTruststoreManager" indent="20" conditionid="securitydomain.add.jsse">
+            <spec id="securitydomain.jsse.add.truststoremanager.text" true="true" false="false" revalidate="yes" set="false"/>
+        </field>
+        <!-- relevant trust-provider fields -->
+        <field type="text" variable="securitydomain.jsse.truststoremanager.algorithm" indent="40" conditionid="securitydomain.add.jsse.truststoremanager" tooltip="securitydomain.jsse.truststoremanager.algorithm.tooltip">
+            <spec id="securitydomain.jsse.truststoremanager.algorithm.text" size="30" set=""/>
+        </field>
+        <field type="text" variable="securitydomain.jsse.truststoremanager.provider" indent="40" conditionid="securitydomain.add.jsse.truststoremanager" tooltip="securitydomain.jsse.truststoremanager.provider.tooltip">
+            <spec id="securitydomain.jsse.truststoremanager.provider.text" size="30" set=""/>
+        </field>
+
+    </panel>
+
+    <panel order="12">
+        <field type="title" align="center" id="cluster.demo.title" bold="true" size="2"/>
+        <field type="staticText" align="left" id="cluster.demo.text"/>
+        <field type="space"/>
+        <field type="text" variable="quartz.db.url" tooltip="quartz.db.username.tooltip">
+            <spec id="quartz.db.url.text" size="40" set="jdbc:VENDOR://DATABASE_URL:PORT/DATABASE_NAME"/>
+        </field>
+        <field type="text" variable="quartz.db.username" tooltip="quartz.db.username.tooltip">
+            <spec id="quartz.db.username.text" size="40" set="databaseuser"/>
+        </field>
+       <field type="password" variable="quartz.db.password" tooltip="quartz.db.password.tooltip" summarize="false" autoPrompt="true">
+            <spec>
+                <pwd id="quartz.db.password.text" size="40"/>
+                <pwd id="quartz.db.password.re.text" size="40"/>
+            </spec>
+            <validator class="com.izforge.izpack.util.NotEmptyValidator" id="username.no.password" ></validator>
+            <validator class="com.izforge.izpack.util.PasswordEqualityValidator" id="username.no.match.password"></validator>
+        </field>
+        <field type="button">
+            <spec id="quartz.db.test.button" msg="db.test.success">
+                <validator class="com.redhat.installer.asconfiguration.jdbc.validator.QuartzConnectionValidator" id="QuartzConnectionValidator.connection.failed"/>
+            </spec>
+        </field>
+    </panel>
+    <panel order="13">
+        <field type="title" align="center" id="optaplanner.title" bold="true" size="2"/>
+        <field type="staticText" align="left" id="optaplanner.text"/>
+        <field type="space"/>
+        <field type="check" variable="disable.optaplanner" defaultFocus="true">
+            <spec id="optaplanner.check.text" true="true" false="false" set="false"/>
+        </field>
+    </panel>
+
+</userInput>

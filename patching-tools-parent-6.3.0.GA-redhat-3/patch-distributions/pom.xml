@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+    <artifactId>patching-tools-parent</artifactId>
+    <version>6.3.0.GA-redhat-3</version>
+  </parent>
+
+  <artifactId>patch-distributions</artifactId>
+  <packaging>pom</packaging>
+
+  <name>JBoss BRMS and BPM Suite Patch Distributions</name>
+  <description>Parent module for specific patch distributions. Contains shared resources and config.</description>
+
+  <properties>
+    <maven.build.timestamp.format>dd MMM, yyyy</maven.build.timestamp.format>
+
+    <product.version>${version.brms-bpmsuite.latest.patch.user.facing}</product.version>
+    <patch.compatibility.versions>6.1.0.GA</patch.compatibility.versions>
+    <patch.dependencies>N/A</patch.dependencies>
+    <patch.supersedes.versions>N/A</patch.supersedes.versions>
+    <patch.creator>Ryan Zhang</patch.creator>
+    <patch.build.date>${maven.build.timestamp}</patch.build.date>
+  </properties>
+
+  <modules>
+    <module>jboss-brms</module>
+    <module>jboss-bpmsuite</module>
+  </modules>
+
+</project>

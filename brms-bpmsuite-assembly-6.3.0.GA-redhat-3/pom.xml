@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ JBoss, Home of Professional Open Source.
+  ~ Copyright 2013, Red Hat, Inc., and individual contributors
+  ~ as indicated by the @author tags. See the copyright.txt file in the
+  ~ distribution for a full listing of individual contributors.
+  ~
+  ~ This is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU Lesser General Public License as
+  ~ published by the Free Software Foundation; either version 2.1 of
+  ~ the License, or (at your option) any later version.
+  ~
+  ~ This software is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this software; if not, write to the Free
+  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>Integration Platform BRMS/BPMSuite Assembly</name>
+    <groupId>org.jboss.ip</groupId>
+    <artifactId>brms-bpmsuite-assembly</artifactId>
+    <version>6.3.0.GA-redhat-3</version>
+    <packaging>pom</packaging>
+
+    <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <maven.test.skip>true</maven.test.skip>
+      <version.org.jboss.errai.cdi10-compatible>3.0.6.Final-redhat-1</version.org.jboss.errai.cdi10-compatible>
+      <version.org.mvel>2.2.8.Final-redhat-1</version.org.mvel>
+      <version.fuse.eap>6.2.1.redhat-084</version.fuse.eap>
+      <generate-secure-conf>generate-secure-conf</generate-secure-conf>
+      <version.org.uberfire>0.8.0.Final-redhat-3</version.org.uberfire>
+      <eap.version>jboss-eap-6.4</eap.version>
+      <version.org.kie.workbench.app>6.3.0.GA</version.org.kie.workbench.app>
+      <version.org.jboss.bom.brms>6.3.0.GA-redhat-3</version.org.jboss.bom.brms>
+      <version.org.jboss.as>7.5.7.Final-redhat-3</version.org.jboss.as>
+      <version.org.uberfire.ext>0.8.0.Final-redhat-3</version.org.uberfire.ext>
+      <version.org.kie>6.4.0.Final-redhat-3</version.org.kie>
+      <version.org.dashbuilder>0.4.0.Final-redhat-3</version.org.dashbuilder>
+      <version.org.jboss.errai>3.2.3.Final-redhat-1</version.org.jboss.errai>
+      <version.org.jboss.integration-platform>6.0.6.Final-redhat-1</version.org.jboss.integration-platform>
+      <jboss.dist.version>7.5.7.Final-redhat-3</jboss.dist.version>
+      
+    </properties>
+
+   <modules>
+     <module>common</module>
+     <module>bpmsuite</module>
+     <module>brms</module>
+   </modules>
+
+  <profiles>
+    <profile>
+      <id>fullProfile</id>
+      <activation>
+        <property>
+          <name>full</name>
+        </property>
+      </activation>
+      <modules>
+        <module>supplementary-tools</module>
+      </modules>
+    </profile>
+  </profiles>
+    <build>
+      <pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.7</version>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.4</version>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.6</version>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>xml-maven-plugin</artifactId>
+            <version>1.0</version>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>1.7</version>
+          </plugin>
+        </plugins>
+      </pluginManagement>
+      <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>regex-property</id>
+                <goals>
+                  <goal>regex-property</goal>
+                </goals>
+                <configuration>
+                  <!-- This will be shown in root directory of deliverables -->
+                  <name>project.version.short</name>
+                  <value>${project.version}</value>
+                  <regex>^([0-9].[0-9]).*$</regex>
+                  <replacement>$1</replacement>
+                  <failIfNoMatch>false</failIfNoMatch>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>project-sources-maven-plugin</artifactId>
+        <version>0.3</version>
+        <executions>
+          <execution>
+            <id>project-sources-archive</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>archive</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      </plugins>
+    </build>
+
+</project>
+<!--
+Modified by POM Manipulation Extension for Maven 1.17 ( SHA: 89482a03 ) 
+-->
+

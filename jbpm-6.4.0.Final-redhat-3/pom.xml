@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-parent-with-dependencies</artifactId>
+    <version>6.4.0.Final-redhat-3</version>
+    <!-- relativePath causes out-of-date problems on hudson slaves -->
+    <!--<relativePath>../droolsjbpm-build-bootstrap/pom.xml</relativePath>-->
+  </parent>
+
+  <groupId>org.jbpm</groupId>
+  <artifactId>jbpm</artifactId>
+  <packaging>pom</packaging>
+  <version>6.4.0.Final-redhat-3</version>
+
+  <name>jBPM :: Multiproject</name>
+  <description>jBPM: a Business Process Management (BPM) Suite</description>
+  <url>http://www.jboss.org/jbpm/</url>
+
+  <properties>
+    <!--
+     These are properties used in the database profiles. Some of them must be initialized
+     empty so that Maven applies them via filtering to the resources. 
+     -->
+    <maven.btm.maxPoolSize>16</maven.btm.maxPoolSize>
+    <maven.hibernate.dialect>org.hibernate.dialect.H2Dialect</maven.hibernate.dialect>
+    <maven.datasource.classname>bitronix.tm.resource.jdbc.lrc.LrcXADataSource</maven.datasource.classname>
+    <maven.jdbc.driver.class>org.h2.Driver</maven.jdbc.driver.class>
+    <maven.jdbc.db.name></maven.jdbc.db.name>
+    <maven.jdbc.db.port></maven.jdbc.db.port>
+    <maven.jdbc.db.server></maven.jdbc.db.server>     
+    <maven.jdbc.driver.jar></maven.jdbc.driver.jar>
+    <maven.jdbc.username>sa</maven.jdbc.username>
+    <maven.jdbc.password>sasa</maven.jdbc.password>
+    <maven.jdbc.url>jdbc:h2:tcp://localhost/target/jbpm-test;MVCC=TRUE</maven.jdbc.url>
+    <maven.jdbc.schema>public</maven.jdbc.schema>
+  </properties>
+
+  <scm>
+    <connection>scm:git:git@github.com:droolsjbpm/jbpm.git</connection>
+    <developerConnection>scm:git:git@github.com:droolsjbpm/jbpm.git</developerConnection>
+    <url>https://github.com/droolsjbpm/jbpm</url>
+  </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>https://issues.jboss.org/browse/JBPM</url>
+  </issueManagement>
+
+  <modules>
+    <module>jbpm-flow</module>
+    <module>jbpm-flow-builder</module>
+    <module>jbpm-persistence-jpa</module>
+    <module>jbpm-query-jpa</module>
+    <module>jbpm-audit</module>
+    <module>jbpm-bpmn2</module>
+    <module>jbpm-bpmn2-emfextmodel</module>
+    <module>jbpm-workitems</module>
+    <module>jbpm-human-task</module>
+    <module>jbpm-runtime-manager</module>
+    <module>jbpm-services</module>
+    <module>jbpm-document</module>
+    <module>jbpm-test</module>
+    <module>jbpm-case-mgmt</module>
+    <module>jbpm-test-coverage</module>
+    <module>jbpm-examples</module>
+    <module>jbpm-installer</module>
+  </modules>
+
+  <dependencyManagement></dependencyManagement>
+
+  <build>
+    <testResources>
+      <testResource>
+        <!-- TODO this overwrite is not normal -->
+        <directory>src/test/java</directory>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
+     <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <includes>
+              <include>**/*Test.java</include>
+            </includes>
+            <excludes>
+              <exclude>**/*AbstractTest.java</exclude>
+              <exclude>**/*JMS*Test.java</exclude>
+            </excludes>
+            <argLine>-Xmx1024m -XX:MaxPermSize=128m</argLine>
+            <additionalClasspathElements>
+              <additionalClasspathElement>${maven.jdbc.driver.jar}</additionalClasspathElement>
+            </additionalClasspathElements>
+          </configuration>
+        </plugin> 
+      </plugins>
+    </pluginManagement>
+     <plugins>
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>project-sources-maven-plugin</artifactId>
+        <version>0.3</version>
+        <executions>
+          <execution>
+            <id>project-sources-archive</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>archive</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>fullProfile</id>
+      <activation>
+        <property>
+          <name>full</name>
+        </property>
+      </activation>
+      <modules>
+        <module>jbpm-distribution</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>mariadb</id>
+      <!-- Important: one still needs to specify the MariaDB JDBC driver jar!
+
+           Following are the default values for MariaDB started via Docker:
+           "docker run &#x002d;&#x002d;name mariadb-jbpm -e MYSQL_ROOT_PASSWORD="admin1234" -d -p 3306:3306 mariadb:latest"
+           (replace the "&#x002d;&#x002d;" with two "-"
+           More info at https://hub.docker.com/_/mariadb/-->
+      <properties>
+        <maven.hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</maven.hibernate.dialect>
+        <maven.datasource.classname>org.mariadb.jdbc.MySQLDataSource</maven.datasource.classname>
+        <maven.jdbc.driver.class>org.mariadb.jdbc.Driver</maven.jdbc.driver.class>
+        <maven.jdbc.db.name>mysql</maven.jdbc.db.name>
+        <maven.jdbc.db.port>3306</maven.jdbc.db.port>
+        <maven.jdbc.driver.jar></maven.jdbc.driver.jar>
+        <maven.jdbc.username>root</maven.jdbc.username>
+        <maven.jdbc.password>admin1234</maven.jdbc.password>
+        <maven.jdbc.url>jdbc:mariadb://localhost:3306/mysql</maven.jdbc.url>
+        <maven.jdbc.schema>mysql</maven.jdbc.schema>
+      </properties>
+    </profile>
+
+  </profiles>
+    
+</project>
+<!--
+Modified by POM Manipulation Extension for Maven 1.17 ( SHA: 89482a03 ) 
+-->
+

@@ -1,0 +1,84 @@
+# This file contains paths inside the distributions that should be ignored when applying the updates. Instead of replacing the
+# old (blacklisted) files, new file with ".new" extension will be created. In case the file was removed in the newer version
+# (but is still present in the distribution being patched), it will not be removed and empty file with ".removed" extension
+# will be created.
+#
+# The blacklisting usually applies to configuration files, but can be used for arbitrary files inside the distribution. Known
+# configuration files are blacklisted by default (see below).
+#
+# Add your own paths in case they are not covered by the default blacklist.
+#
+# Below is the list of files blacklisted by default. Please note that not all of these files are necessary part of the updates.
+
+# EAP 6.x bundle
+bin/kie.policy
+bin/security.policy
+
+standalone/configuration/standalone-full-ha.xml
+standalone/configuration/standalone-full.xml
+standalone/configuration/standalone-ha.xml
+standalone/configuration/standalone-osgi.xml
+standalone/configuration/standalone.xml
+domain/configuration/domain.xml
+
+standalone/deployments/business-central.war/META-INF/context.xml
+standalone/deployments/business-central.war/WEB-INF/beans.xml
+standalone/deployments/business-central.war/WEB-INF/bpms-jms.xml
+standalone/deployments/business-central.war/WEB-INF/ejb-jar.xml
+standalone/deployments/business-central.war/WEB-INF/jboss-web.xml
+standalone/deployments/business-central.war/WEB-INF/jboss-deployment-structure.xml
+standalone/deployments/business-central.war/WEB-INF/web.xml
+standalone/deployments/business-central.war/WEB-INF/web-exec-server.xml
+standalone/deployments/business-central.war/WEB-INF/web-ui-server.xml
+standalone/deployments/business-central.war/WEB-INF/classes/author_mappings.properties
+standalone/deployments/business-central.war/WEB-INF/classes/designer.configuration
+standalone/deployments/business-central.war/WEB-INF/classes/ErraiApp.properties
+standalone/deployments/business-central.war/WEB-INF/classes/jbpm.audit.jms.properties
+standalone/deployments/business-central.war/WEB-INF/classes/restricted-groups.properties
+standalone/deployments/business-central.war/WEB-INF/classes/userinfo.properties
+standalone/deployments/business-central.war/WEB-INF/classes/workbench-policy.properties
+standalone/deployments/business-central.war/WEB-INF/classes/META-INF/kie-wb-deployment-descriptor.xml
+standalone/deployments/business-central.war/WEB-INF/classes/META-INF/persistence.xml
+
+standalone/deployments/dashbuilder.war/WEB-INF/jboss-web.xml
+standalone/deployments/dashbuilder.war/WEB-INF/jboss-deployment-structure.xml
+standalone/deployments/dashbuilder.war/WEB-INF/web.xml
+standalone/deployments/dashbuilder.war/WEB-INF/etc/hibernate.cfg.xml
+
+standalone/deployments/kie-server.war/META-INF/kie-server-jms.xml
+standalone/deployments/kie-server.war/WEB-INF/jboss-web.xml
+standalone/deployments/kie-server.war/WEB-INF/web.xml
+
+business-central.war/META-INF/context.xml
+business-central.war/WEB-INF/beans.xml
+business-central.war/WEB-INF/ejb-jar.xml
+business-central.war/WEB-INF/weblogic-ejb-jar.xml
+business-central.war/WEB-INF/weblogic.xml
+business-central.war/WEB-INF/web.xml
+business-central.war/WEB-INF/web-exec-server.xml
+business-central.war/WEB-INF/web-ui-server.xml
+business-central.war/WEB-INF/classes/author_mappings.properties
+business-central.war/WEB-INF/classes/designer.configuration
+business-central.war/WEB-INF/classes/ErraiApp.properties
+business-central.war/WEB-INF/classes/jbpm.audit.jms.properties
+business-central.war/WEB-INF/classes/login.config
+business-central.war/WEB-INF/classes/realm.properties
+business-central.war/WEB-INF/classes/restricted-groups.properties
+business-central.war/WEB-INF/classes/userinfo.properties
+business-central.war/WEB-INF/classes/workbench-policy.properties
+business-central.war/WEB-INF/classes/META-INF/kie-wb-deployment-descriptor.xml
+business-central.war/WEB-INF/classes/META-INF/persistence.xml
+
+dashbuilder.war/META-INF/context.xml
+dashbuilder.war/WEB-INF/beans.xml
+dashbuilder.war/WEB-INF/web.xml
+dashbuilder.war/WEB-INF/weblogic.xml
+dashbuilder.war/WEB-INF/etc/hibernate.cfg.xml
+
+kie-server.war/META-INF/kie-server-jms.xml
+kie-server.war/WEB-INF/weblogic-ejb-jar.xml
+kie-server.war/WEB-INF/weblogic.xml
+kie-server.war/WEB-INF/web.xml
+
+SecurityPolicy/kie.policy
+SecurityPolicy/security.policy

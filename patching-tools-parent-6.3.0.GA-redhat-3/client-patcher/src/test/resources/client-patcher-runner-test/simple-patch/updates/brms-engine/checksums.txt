@@ -1,0 +1,3 @@
+# content is not important, used to test the file gets parsed
+some/nice/path=2a5cb27eed7a09d458c63ae1b8bd6f2b
+some-file=2a5cb27eed7a09d458c63ae1b8bd6f2b,8b44b5e7f7e021be006ceb5c789b1302

@@ -1,0 +1,3 @@
+/system-property=org.kie.example:add(value="true")
+/system-property=org.jbpm.designer.perspective:add(value="full")
+/system-property=designerdataobjects:add(value="false")

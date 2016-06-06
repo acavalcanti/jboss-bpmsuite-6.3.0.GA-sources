@@ -1,0 +1,1637 @@
+<processing>
+    <job name="Setting required properties" condition="use.same.password">
+        <executeclass name="com.redhat.installer.password.processpanel.SetMasterPassword"/>
+    </job>
+    <!-- log the izpack variables map. -->
+    <!-- also set some system properties relevant to installation -->
+    <job name="Logging installation information">
+        <executeclass name="com.redhat.installer.logging.LogIzPackVars"/>
+    </job>
+    
+    <job name="Adding temporary admin user">
+        <os family="unix"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.CommandRunner">
+            <arg>--mute=true</arg>
+            <arg>${INSTALL_PATH}/bin/add-user.sh</arg>
+            <arg>-s</arg>
+            <arg>-u</arg>
+            <arg>${postinstall.username}</arg>
+            <arg>-p</arg>
+            <arg>${postinstall.password}</arg>
+        </executeclass>
+    </job>
+
+    <job name="Adding temporary admin user">
+        <os family="windows"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.CommandRunner">
+            <arg>--mute=true</arg>
+            <arg>${INSTALL_PATH}/bin/add-user.bat</arg>
+            <arg>-s</arg>
+            <arg>-u</arg>
+            <arg>${postinstall.username}</arg>
+            <arg>-p</arg>
+            <arg>${postinstall.password}</arg>
+        </executeclass>
+    </job>
+
+
+    <job name="Modify business-central persistence.xml" condition="install.businessCentral.datasource">
+	<executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+	    <arg>--file=${INSTALL_PATH}/standalone/deployments/business-central.war/WEB-INF/classes/META-INF/persistence.xml</arg>
+            <arg>--replace=java:jboss/datasources/ExampleDS</arg>
+            <arg>--text=${BusinessCentralDatasource.jdbc.datasource.jndiname}</arg>
+	</executeclass>
+    </job>
+
+    <job name="Modify business-central persistence.xml" condition="install.businessCentral.datasource">
+	<executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+	    <arg>--file=${INSTALL_PATH}/standalone/deployments/business-central.war/WEB-INF/classes/META-INF/persistence.xml</arg>
+            <arg>--replace=H2Dialect</arg>
+            <arg>--text=${db.dialect}</arg>
+	</executeclass>
+    </job>
+
+    <job name="Modify dashbuilder jboss-web.xml" condition="install.dashbuilder.datasource">
+	<executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+	    <arg>--file=${INSTALL_PATH}/standalone/deployments/dashbuilder.war/WEB-INF/jboss-web.xml</arg>	
+	    <arg>--replace=java:jboss/datasources/ExampleDS</arg>
+	    <arg>--text=${DashbuilderDatasource.jdbc.datasource.jndiname}</arg>
+	</executeclass>
+    </job>
+
+    <job name="Patching host.xml* configuration file" condition="add.bits.to.configs">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+            <arg>--file=${INSTALL_PATH}/domain/configuration/host.xml</arg>
+            <arg>--file=${INSTALL_PATH}/domain/configuration/host-master.xml</arg>
+            <arg>--file=${INSTALL_PATH}/domain/configuration/host-slave.xml</arg>
+            <arg>--replace=&lt;option value=&quot;-server&quot;/&gt;</arg>
+            <arg>--text=&lt;option value=&quot;-server&quot;/&gt;&lt;option value=&quot;-d64&quot;/&gt;</arg>
+        </executeclass>
+    </job>
+
+    <job name="Patching domain.conf configuration file" condition="add.bits.to.configs">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+            <arg>--file=${INSTALL_PATH}/bin/domain.conf</arg>
+            <arg>--replace=&quot;$JAVA_OPTS -Djboss.modules.policy-permissions=true&quot;</arg>
+            <arg>--text=&quot;$JAVA_OPTS -Djboss.modules.policy-permissions=true -d64&quot;</arg>
+        </executeclass>
+    </job>
+
+    <job name="Patching standalone.conf and appclient.conf" condition="add.bits.to.configs">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/bin/standalone.conf</arg>
+            <arg>--file=${INSTALL_PATH}/bin/appclient.conf</arg>
+            <arg>--text=JAVA_OPTS=&quot;-d64 $JAVA_OPTS&quot;</arg>
+        </executeclass>
+    </job>
+	
+    <job name="Adjusting quartz-definition.propeties" condition="install.cluster.demo">
+	<executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+	    <arg>--file=${INSTALL_PATH}/domain/configuration/quartz-definition.properties</arg>
+	    <arg>--replace=PostgreSQLDelegate</arg>
+	    <arg>--text=${quartz.jobstore.delegate}</arg>
+	</executeclass>
+    </job>
+
+    <job name="Copy intial zookeeper-one configuration" condition="install.cluster.demo">
+        <executeclass name="com.redhat.installer.installation.processpanel.FileMover">
+	    <arg>--copy=true</arg>
+	    <arg>--dest-is-file=true</arg>
+            <arg>--enable-messages=true</arg>
+            <arg>--source=${INSTALL_PATH}/${supp.dir.name}/zookeeper-one/conf/zoo_sample.cfg</arg>
+            <arg>--destination=${INSTALL_PATH}/${supp.dir.name}/zookeeper-one/conf/zoo.cfg</arg>
+        </executeclass>
+    </job>
+
+    <job name="Copy intial zookeeper-two configuration" condition="install.cluster.demo">
+        <executeclass name="com.redhat.installer.installation.processpanel.FileMover">
+	    <arg>--copy=true</arg>
+	    <arg>--dest-is-file=true</arg>
+            <arg>--enable-messages=true</arg>
+            <arg>--source=${INSTALL_PATH}/${supp.dir.name}/zookeeper-two/conf/zoo_sample.cfg</arg>
+            <arg>--destination=${INSTALL_PATH}/${supp.dir.name}/zookeeper-two/conf/zoo.cfg</arg>
+        </executeclass>
+    </job>
+
+    <job name="Copy intial zookeeper-three configuration" condition="install.cluster.demo">
+        <executeclass name="com.redhat.installer.installation.processpanel.FileMover">
+	    <arg>--copy=true</arg>
+	    <arg>--dest-is-file=true</arg>
+            <arg>--enable-messages=true</arg>
+            <arg>--source=${INSTALL_PATH}/${supp.dir.name}/zookeeper-three/conf/zoo_sample.cfg</arg>
+            <arg>--destination=${INSTALL_PATH}/${supp.dir.name}/zookeeper-three/conf/zoo.cfg</arg>
+        </executeclass>
+    </job>
+
+    <job name="Modifying zookeeper-one configuration" condition="install.cluster.demo">
+	<executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+	    <arg>--file=${INSTALL_PATH}/${supp.dir.name}/zookeeper-one/conf/zoo.cfg</arg>	
+	    <arg>--replace=dataDir=/tmp/zookeeper</arg>
+	    <arg>--text=dataDir=${INSTALL_PATH}/${supp.dir.name}/zookeeper-one/data</arg>
+	    <arg>--java-file-separator=true</arg>
+	</executeclass>
+    </job>
+
+    <job name="Modifying zookeeper-two configuration" condition="install.cluster.demo">
+	<executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+	    <arg>--file=${INSTALL_PATH}/${supp.dir.name}/zookeeper-two/conf/zoo.cfg</arg>	
+	    <arg>--replace=dataDir=/tmp/zookeeper</arg>
+	    <arg>--text=dataDir=${INSTALL_PATH}/${supp.dir.name}/zookeeper-two/data</arg>
+	    <arg>--java-file-separator=true</arg>
+	</executeclass>
+    </job>
+
+    <job name="Modifying zookeeper-two configuration" condition="install.cluster.demo">
+	<executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+	    <arg>--file=${INSTALL_PATH}/${supp.dir.name}/zookeeper-two/conf/zoo.cfg</arg>	
+	    <arg>--replace=clientPort=2181</arg>
+	    <arg>--text=clientPort=2182</arg>
+	</executeclass>
+    </job>
+
+    <job name="Modifying zookeeper-three configuration" condition="install.cluster.demo">
+	<executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+	    <arg>--file=${INSTALL_PATH}/${supp.dir.name}/zookeeper-three/conf/zoo.cfg</arg>	
+	    <arg>--replace=dataDir=/tmp/zookeeper</arg>
+	    <arg>--text=dataDir=${INSTALL_PATH}/${supp.dir.name}/zookeeper-three/data</arg>
+	    <arg>--java-file-separator=true</arg>
+	</executeclass>
+    </job>
+
+    <job name="Modifying zookeeper-three configuration" condition="install.cluster.demo">
+	<executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+	    <arg>--file=${INSTALL_PATH}/${supp.dir.name}/zookeeper-three/conf/zoo.cfg</arg>	
+	    <arg>--replace=clientPort=2181</arg>
+	    <arg>--text=clientPort=2183</arg>
+	</executeclass>
+    </job>
+
+    <job name="Adding zookeeper-one myid file" condition="install.cluster.demo">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/${supp.dir.name}/zookeeper-one/data/myid</arg>
+            <arg>1</arg>
+        </executeclass>
+    </job>
+
+    <job name="Adding zookeeper-two myid file" condition="install.cluster.demo">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/${supp.dir.name}/zookeeper-two/data/myid</arg>
+            <arg>2</arg>
+        </executeclass>
+    </job>
+
+    <job name="Adding zookeeper-three myid file" condition="install.cluster.demo">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/${supp.dir.name}/zookeeper-three/data/myid</arg>
+            <arg>3</arg>
+        </executeclass>
+    </job>
+
+    <job name="Modifying zookeeper configurations" condition="install.cluster.demo">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/${supp.dir.name}/zookeeper-one/conf/zoo.cfg</arg>
+            <arg>server.1=localhost:2888:3888</arg>
+            <arg>server.2=localhost:2889:3889</arg>
+            <arg>server.3=localhost:2890:3890</arg>
+        </executeclass>
+    </job>
+    <job name="Modifying zookeeper configurations" condition="install.cluster.demo">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/${supp.dir.name}/zookeeper-two/conf/zoo.cfg</arg>
+            <arg>server.1=localhost:2888:3888</arg>
+            <arg>server.2=localhost:2889:3889</arg>
+            <arg>server.3=localhost:2890:3890</arg>
+        </executeclass>
+    </job>
+
+    <job name="Modifying zookeeper configurations" condition="install.cluster.demo">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/${supp.dir.name}/zookeeper-three/conf/zoo.cfg</arg>
+            <arg>server.1=localhost:2888:3888</arg>
+            <arg>server.2=localhost:2889:3889</arg>
+            <arg>server.3=localhost:2890:3890</arg>
+        </executeclass>
+    </job>
+
+    <!--<job name="Executing Quartz DDL scripts" condition="install.cluster.demo">
+        <executeclass name="com.redhat.installer.installation.processpanel.SqlScriptExecuter">
+	    <arg>-script-path=${quartz.ddl.script}</arg>
+	    <arg>-driver=${jdbc.driver.class.name}</arg>
+	    <arg>-username=${quartz.db.username}</arg>
+	    <arg>-password=${quartz.db.password}</arg>
+	    <arg>-db-url=${quartz.db.url}</arg>
+        </executeclass>
+    </job>-->
+
+    <!-- make sure that IPv6 is preferred if the user selects it to be -->
+    <!-- TODO: domain.xml? -->
+    <job name="Apply IPv6 configuration to server descriptors" condition="pure.ipv6.machine">
+        <os family="unix"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+            <arg>--file=${INSTALL_PATH}/standalone/configuration/standalone.xml</arg>
+            <arg>--file=${INSTALL_PATH}/standalone/configuration/standalone-ha.xml</arg>
+            <arg>--file=${INSTALL_PATH}/standalone/configuration/standalone-full.xml</arg>
+            <arg>--file=${INSTALL_PATH}/standalone/configuration/standalone-osgi.xml</arg>
+            <arg>--file=${INSTALL_PATH}/standalone/configuration/standalone-full-ha.xml</arg>
+            <arg>--file=${INSTALL_PATH}/domain/configuration/domain.xml</arg>
+            <arg>--file=${INSTALL_PATH}/domain/configuration/host.xml</arg>
+            <arg>--replace=127.0.0.1</arg>
+            <arg>--text=localhost</arg>
+        </executeclass>
+    </job>
+
+    <job name="Apply IPv6 configuration to server descriptors" condition="pure.ipv6.machine">
+        <os family="windows"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+            <arg>--file=${INSTALL_PATH}\standalone\configuration\standalone.xml</arg>
+            <arg>--file=${INSTALL_PATH}\standalone\configuration\standalone-ha.xml</arg>
+            <arg>--file=${INSTALL_PATH}\standalone\configuration\standalone-full.xml</arg>
+            <arg>--file=${INSTALL_PATH}\standalone\configuration\standalone-osgi.xml</arg>
+            <arg>--file=${INSTALL_PATH}\standalone\configuration\standalone-full-ha.xml</arg>
+            <arg>--file=${INSTALL_PATH}\domain\configuration\domain.xml</arg>
+            <arg>--file=${INSTALL_PATH}\domain\configuration\host.xml</arg>
+            <arg>--replace=127.0.0.1</arg>
+            <arg>--text=localhost</arg>
+        </executeclass>
+    </job>
+
+    <job name="Apply IPv6 configuration to server start scripts" condition="pure.ipv6.machine">
+        <os family="unix"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+            <arg>--file=${INSTALL_PATH}/bin/standalone.conf</arg>
+            <arg>--file=${INSTALL_PATH}/bin/domain.conf</arg>
+            <arg>--replace=-Djava.net.preferIPv4Stack=true</arg>
+            <arg>--text=-Djava.net.preferIPv4Stack=false -Djava.net.preferIPv6Addresses=true</arg>
+        </executeclass>
+    </job>
+
+    <job name="Apply IPv6 configuration to server start scripts" condition="pure.ipv6.machine">
+        <os family="windows"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+            <arg>--file=${INSTALL_PATH}\bin\standalone.conf.bat</arg>
+            <arg>--file=${INSTALL_PATH}\bin\domain.conf.bat</arg>
+            <arg>--replace=-Djava.net.preferIPv4Stack=true</arg>
+            <arg>--text=-Djava.net.preferIPv4Stack=false -Djava.net.preferIPv6Addresses=true</arg>
+        </executeclass>
+    </job>
+
+    <job name="Apply IPv6 configuration to domain server descriptor" condition="pure.ipv6.machine">
+        <os family="unix"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+            <arg>--file=${INSTALL_PATH}/domain/configuration/domain.xml</arg>
+            <arg>--regex=.*&quot;java.net.preferIPv4Stack&quot;.*</arg>
+            <arg>--text=&lt;!-- ||SELF|| --&gt;</arg>
+        </executeclass>
+    </job>
+
+    <job name="Apply IPv6 configuration to domain server descriptor" condition="pure.ipv6.machine">
+        <os family="windows"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+            <arg>--file=${INSTALL_PATH}\domain\configuration\domain.xml</arg>
+            <arg>--regex=.*&quot;java.net.preferIPv4Stack&quot;.*</arg>
+            <arg>--text=&lt;!-- ||SELF|| --&gt;</arg>
+        </executeclass>
+    </job>
+
+    <job name="Apply IPv6 configuration to jboss.cli" condition="pure.ipv6.machine">
+        <os family="windows"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+            <arg>--file=${INSTALL_PATH}\bin\jboss-cli.bat</arg>
+            <arg>--replace=-Djboss.modules.system.pkgs=com.sun.java.swing</arg>
+            <arg>--text=-Djboss.modules.system.pkgs=com.sun.java.swing -Djava.net.preferIPv4Stack=false -Djava.net.preferIPv6Addresses=true</arg>
+        </executeclass>
+    </job>
+
+    <!-- generate user specified vault keystore -->
+    <!-- WARNING: needs a better way to specify the DNAME -->
+    <job name="Generating custom password vault keystore" condition="install.vault+new.postinstall.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.keystore.processpanel.KeystoreGenerator">
+            <arg>--operation=-genseckey</arg>
+            <arg>--parameter=-keystore ${vault.keystoreloc}</arg>
+            <arg>--parameter=-storepass ${vault.keystorepwd}</arg>
+            <arg>--parameter=-keyalg AES</arg>
+            <arg>--parameter=-keysize 128</arg>
+            <arg>--parameter=-alias ${vault.alias}</arg>
+            <arg>--parameter=-storetype jceks</arg>
+            <arg>--parameter=-validity 36500</arg>
+            <arg>--allow-existing=true</arg>
+        </executeclass>
+    </job>
+
+    <!-- generate default vault keystore -->
+    <job name="Generating default password vault keystore" condition="install.default.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.keystore.processpanel.KeystoreGenerator">
+            <arg>--operation=-genseckey</arg>
+            <arg>--parameter=-keystore ${INSTALL_PATH}/vault.keystore</arg>
+            <arg>--parameter=-storepass ${vault.keystorepwd}</arg>
+            <arg>--parameter=-keyalg AES</arg>
+            <arg>--parameter=-keysize 128</arg>
+            <arg>--parameter=-alias vault</arg>
+            <arg>--parameter=-storetype jceks</arg>
+            <arg>--parameter=-validity 36500</arg>
+        </executeclass>
+    </job>
+
+    <!-- generate a default server keystore -->
+    <job name="Generating server keystore">
+        <executeclass name="com.redhat.installer.asconfiguration.keystore.processpanel.KeystoreGenerator">
+            <arg>--operation=-genkeypair</arg>
+            <arg>--parameter=-keystore ${generated.keystores.server.location}</arg>
+            <arg>--parameter=-storepass ${generated.keystores.server.storepass}</arg>
+            <arg>--parameter=-keyalg RSA</arg>
+            <arg>--parameter=-keysize 1024</arg>
+            <arg>--parameter=-alias ${generated.keystores.server.alias}</arg>
+            <arg>--parameter=-storetype jks</arg>
+            <arg>--parameter=-validity 36500</arg>
+            <arg>--parameter=-dname CN=ServerKeystore,OU=JBoss,O=RedHat,L=Westford,ST=Mass,C=US</arg>
+            <arg>--put-location-in-props=generated.keystores.server.location</arg>
+        </executeclass>
+    </job>
+
+    <!-- export the default server keystore certificate ie:
+     -exportcert -keystore server.jks -storepass blah -file blah.cert -alias <server keystore alias> -->
+    <job name="Exporting server keystore certificate">
+        <executeclass name="com.redhat.installer.asconfiguration.keystore.processpanel.KeystoreGenerator">
+            <arg>--operation=-exportcert</arg>
+            <arg>--parameter=-keystore ${generated.keystores.server.location}</arg>
+            <arg>--parameter=-storepass ${generated.keystores.server.storepass}</arg>
+            <arg>--parameter=-file ${generated.keystores.certificate.location}</arg>
+            <arg>--parameter=-alias ${generated.keystores.server.alias}</arg>
+        </executeclass>
+    </job>
+
+    <job name="Generating client keystores" condition="generate.client.keystores">
+        <executeclass name="com.redhat.installer.asconfiguration.keystore.processpanel.ClientKeystoreBuilder">
+            <arg>--number=${generated.keystores.client.number}</arg>
+            <arg>--client-path=${generated.keystores.client.location}</arg>
+            <arg>--cert-path=${generated.keystores.certificate.location}</arg>
+            <arg>--client-password=${generated.keystores.client.storepass}</arg>
+            <arg>--server-alias=${generated.keystores.server.alias}</arg>
+        </executeclass>
+    </job>
+
+    <job name="Importing certificate to existing keystores" condition="!generate.client.keystores">
+        <executeclass name="com.redhat.installer.asconfiguration.keystore.processpanel.ClientKeystoreBuilder">
+            <arg>--number=${generated.keystores.client.number}</arg>
+            <arg>--client-path=${existing.keystores.client.location}</arg>
+            <arg>--cert-path=${generated.keystores.certificate.location}</arg>
+            <arg>--client-password=${generated.keystores.client.storepass}</arg>
+            <arg>--server-alias=${generated.keystores.server.alias}</arg>
+        </executeclass>
+    </job>
+
+    <job name="Removing server certificate">
+        <executeclass name="com.redhat.installer.installation.processpanel.FileDeleter">
+            <arg>${generated.keystores.certificate.location}</arg>
+        </executeclass>
+    </job>
+
+   <job name="Adding Business Process Management Suite user">
+       <os family="unix"/>
+       <executeclass name="com.redhat.installer.installation.processpanel.CommandRunner">
+           <arg>--mute=true</arg>
+           <arg>${INSTALL_PATH}/bin/add-user.sh</arg>
+           <arg>-s</arg>
+           <arg>-a</arg>
+           <arg>-u</arg>
+           <arg>${bpms.user}</arg>
+           <arg>-ro</arg>
+           <arg>admin,${bpms.user.additional.roles}</arg>
+           <arg>-p</arg>
+           <arg>${bpms.password}</arg>
+       </executeclass>
+   </job>
+
+   <job name="Adding Business Process Management Suite user">
+       <os family="windows"/>
+       <executeclass name="com.redhat.installer.installation.processpanel.CommandRunner">
+           <arg>--mute=true</arg>
+           <arg>${INSTALL_PATH}/bin/add-user.bat</arg>
+           <arg>-s</arg>
+           <arg>-a</arg>
+           <arg>-u</arg>
+           <arg>${bpms.user}</arg>
+           <arg>-ro</arg>
+           <arg>admin,${bpms.user.additional.roles}</arg>
+           <arg>-p</arg>
+           <arg>${bpms.password}</arg>
+       </executeclass>
+   </job>
+
+    <!-- Add the admin user -->
+    <job name="Adding admin user" condition="add.admin.user">
+        <os family="unix"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.CommandRunner">
+            <arg>--mute=true</arg>
+            <arg>${INSTALL_PATH}/bin/add-user.sh</arg>
+            <arg>-s</arg>
+            <arg>-u</arg>
+            <arg>${adminUser}</arg>
+            <arg>-p</arg>
+            <arg>${adminPassword}</arg>
+        </executeclass>
+    </job>
+
+    <job name="Adding admin user" condition="add.admin.user">
+        <os family="windows"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.CommandRunner">
+            <arg>--mute=true</arg>
+            <arg>${INSTALL_PATH}/bin/add-user.bat</arg>
+            <arg>-s</arg>
+            <arg>-u</arg>
+            <arg>${adminUser}</arg>
+            <arg>-p</arg>
+            <arg>${adminPassword}</arg>
+        </executeclass>
+    </job>
+
+    <job name="Appending version onto version.txt">
+        <executeclass name="com.redhat.installer.layering.processpanel.VersionTxtSetter"/>
+    </job>
+
+    <job name="Advanced configuration - LDAP for Business Central - New file creation" condition="postinstall.server+install.ldap.business.central">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/standalone/deployments/business-central.war/WEB-INF/classes/jbpm.usergroup.callback.properties</arg>
+            <arg>java.naming.provider.url=${ldap.url}</arg>
+            <arg>ldap.bind.user=${ldap.dn}</arg>
+            <arg>ldap.bind.pwd=${ldap.password}</arg>
+            <arg>ldap.user.ctx=${ldap.businesscentral.user.context}</arg>
+            <arg>ldap.user.filter=${ldap.businesscentral.user.filter}</arg>
+            <arg>ldap.user.roles.ctx=${ldap.businesscentral.user.roles.context}</arg>
+            <arg>ldap.user.roles.filter=${ldap.businesscentral.user.roles.filter}</arg>
+            <arg>ldap.role.ctx=${ldap.businesscentral.role.context}</arg>
+            <arg>ldap.role.filter=${ldap.businesscentral.role.filter}</arg>
+            <arg>ldap.search.scope=SUBTREE_SCOPE</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - LDAP for Business Central - New file creation" condition="postinstall.server+install.ldap.business.central">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/standalone/deployments/business-central.war/WEB-INF/classes/jbpm.user.info.properties</arg>
+            <arg>java.naming.provider.url=${ldap.url}</arg>
+            <arg>ldap.bind.user=${ldap.dn}</arg>
+            <arg>ldap.bind.pwd=${ldap.password}</arg>
+            <arg>ldap.user.ctx=${ldap.businesscentral.user.context}</arg>
+            <arg>ldap.user.filter=${ldap.businesscentral.user.filter}</arg>
+            <arg>ldap.role.ctx=${ldap.businesscentral.role.context}</arg>
+            <arg>ldap.role.filter=${ldap.businesscentral.role.filter}</arg>
+            <arg>ldap.search.scope=SUBTREE_SCOPE</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - LDAP for Business Central - Changes to jboss-web.xml"
+        condition="postinstall.server+install.ldap.business.central">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+            <arg>--file=${INSTALL_PATH}/standalone/deployments/business-central.war/WEB-INF/jboss-web.xml</arg>
+            <arg>--file=${INSTALL_PATH}/standalone/deployments/dashbuilder.war/WEB-INF/jboss-web.xml</arg>
+            <arg>--replace=other</arg>
+            <arg>--text=business-central-ldap</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - LDAP for Business Central - Changes to beans.xml"
+        condition="postinstall.server+install.ldap.business.central">
+        <executeclass name="com.redhat.installer.installation.processpanel.TextReplacer">
+            <arg>--file=${INSTALL_PATH}/standalone/deployments/business-central.war/WEB-INF/beans.xml</arg>
+            <arg>--replace=JAASUserGroupInfoProducer</arg>
+            <arg>--text=LDAPUserGroupInfoProducer</arg>
+        </executeclass>
+    </job>
+
+    <job name="Add JAVA_OPTS to standalone.conf" condition="jvm.security.enabled">
+	<os family="unix"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/bin/standalone.conf</arg>
+            <arg># added during the installation process</arg>
+            <arg>SECMGR=true</arg>
+            <arg>JAVA_OPTS="$JAVA_OPTS -Djboss.modules.policy-permissions=true  \"-Djava.security.policy=$DIRNAME/security.policy\" \"-Dkie.security.policy=$DIRNAME/kie.policy\""</arg>
+        </executeclass>
+    </job>
+
+    <job name="Add JAVA_OPTS to standalone.conf" condition="!jvm.security.enabled">
+	<os family="unix"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/bin/standalone.conf</arg>
+            <arg># added during the installation process. Uncomment the following lines to enable the java security manager</arg>
+            <arg>#SECMGR=true</arg>
+            <arg>#JAVA_OPTS="$JAVA_OPTS -Djboss.modules.policy-permissions=true \"-Djava.security.policy=$DIRNAME/security.policy\" \"-Dkie.security.policy=$DIRNAME/kie.policy\""</arg>
+        </executeclass>
+    </job>
+
+    <job name="Add JAVA_OPTS to standalone.conf.bat" condition="jvm.security.enabled">
+	<os family="windows"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/bin/standalone.conf.bat</arg>
+            <arg>rem # added during the installation process</arg>
+	    <arg>set "SECMGR=true"</arg>
+            <arg>set "JAVA_OPTS=%JAVA_OPTS% -Djboss.modules.policy-permissions=true "-Djava.security.policy=%DIRNAME%security.policy" "-Dkie.security.policy=%DIRNAME%kie.policy""</arg>
+        </executeclass>
+    </job>
+
+    <job name="Add JAVA_OPTS to standalone.conf.bat" condition="!jvm.security.enabled">
+	<os family="windows"/>
+        <executeclass name="com.redhat.installer.installation.processpanel.TextFileAppender">
+            <arg>--file=${INSTALL_PATH}/bin/standalone.conf.bat</arg>
+            <arg>rem # added during the installation process. Uncomment the following lines to enable the java security manager</arg>
+            <arg>rem # set "SECMGR=true"</arg>
+            <arg>rem # set "JAVA_OPTS=%JAVA_OPTS% -Djboss.modules.policy-permissions=true "-Djava.security.policy=%DIRNAME%security.policy" "-Dkie.security.policy=%DIRNAME%kie.policy""</arg>
+        </executeclass>
+    </job>
+    <!-- SOA/BRMS/BPMS END-->
+
+    <!-- standard standalone.xml server execution -->
+    <job name="Starting standalone">
+        <os family="unix" />
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}/bin/standalone.sh</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}/</arg>
+        </executeclass>
+    </job>
+
+    <!-- standard standalone.xml server execution Winodws -->
+    <job name="Starting standalone">
+        <os family="windows" />
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}\bin\standalone.bat</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}\</arg>
+        </executeclass>
+    </job>
+
+    <job name="Querying server for jboss.server.data.dir">
+        <executeclass name="com.redhat.installer.asconfiguration.vault.processpanel.ServerVariableHelper">
+            <arg>jboss.home.dir</arg>
+        </executeclass>
+    </job>
+
+    <job name="Writing KIE server properties">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.kie.server.repo=${jboss.server.data.dir}</arg>
+	</executeclass>
+    </job>
+
+    <job name="Disabling Optaplanner Execution Server" condition="disable.optaplanner">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.optaplanner.server.ext.disabled=true</arg>
+	</executeclass>
+    </job>
+
+    <!-- begin advanced configuration: standalone.xml -->
+    <!-- vault -->
+    <job name="Advanced standalone configuration - Vault"
+         condition="install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.CustomVault">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone configuration - Vault"
+         condition="!install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.DefaultVault">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced Configuration - Jdbc"
+         condition="install.cluster.demo|install.businessCentral.datasource|install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Jdbc">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Execute Quartz DDL Script" condition="install.cluster.demo">
+	    <executeclass name="com.redhat.installer.installation.processpanel.DdlRunner">
+            <arg>${INSTALL_PATH}/${supp.dir.name}/ddl-scripts/</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Dashbuilder Datasource"
+         condition="install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=standalone.xml</arg>
+            <arg>--text=DashbuilderDatasource</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Business-Central Datasource"
+         condition="install.businessCentral.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=standalone.xml</arg>
+            <arg>--text=BusinessCentralDatasource</arg>
+        </executeclass>
+    </job>
+
+    <!-- security domain -->
+    <job name="Advanced standalone configuration - Security Domain"
+         condition="install.securitydomain">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SecurityDomain">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <!-- Ssl -->
+    <job name="Advanced standalone configuration - SSL"
+         condition="install.ssl">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Ssl">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <!-- ldap -->
+    <job name="Advanced standalone configuration - LDAP Connection"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapConnection">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone configuration - LDAP for Management Interfaces"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapSecurityRealm">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+   <!-- end advanced configuration: standalone.xml -->
+
+    <job name="Vaulting installation passwords">
+        <executeclass name="com.redhat.installer.asconfiguration.vault.processpanel.PasswordVaulter">
+            <arg>--username=${postinstall.username}</arg>
+            <arg>--password=${postinstall.password}</arg>
+            <arg>--pwd-args=vaulted,generated.keystores.server.storepass,${generated.keystores.server.storepass}</arg>
+        </executeclass>
+    </job>
+
+    <job name="Adding system properties">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--resolve-params=false</arg>
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-system-properties.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring MDB" condition="!standalone.xml.org.jboss.as.messaging.extension.exists">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-mdb-extension.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring MDB">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-mdb-conf.cli</arg>
+        </executeclass>
+    </job>
+
+   <job name="Configuring JMS Roles">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-jms-role.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring SSO">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-sso-conf.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring logging filters">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-logging-filter.cli</arg>
+        </executeclass>
+    </job>
+
+    <!-- must come after add-mdb-*.cli, since that script adds the required elements -->
+    <job name="Advanced standalone configuration - LDAP for Business Central"
+        condition="postinstall.server+install.ldap.business.central">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.BxmsSecurityDomain">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+ 
+    <!-- shutdown the server running with standalone.xml -->
+    <job name="Shutdown standalone" >
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>standalone</arg>
+        </executeclass>
+    </job>
+
+    <!-- standard standlone-ha.xml server execution -->
+    <job name="Starting standalone-ha" >
+        <os family="unix" />
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}/bin/standalone.sh</arg>
+            <arg>--standalone-config=ha</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}/</arg>
+        </executeclass>
+    </job>
+
+    <!-- standard standlone-ha.xml server execution windows-->
+    <job name="Starting standalone-ha" >
+        <os family="windows" />
+         <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}\bin\standalone.bat</arg>
+            <arg>--standalone-config=ha</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}\</arg>
+        </executeclass>
+    </job>
+
+    <job name="Writing KIE server properties">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.kie.server.repo=${jboss.server.data.dir}</arg>
+	</executeclass>
+    </job>
+
+    <job name="Disabling Optaplanner Execution Server" condition="disable.optaplanner">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.optaplanner.server.ext.disabled=true</arg>
+	</executeclass>
+    </job>
+
+    <!-- begin advanced configuration: standalone-ha.xml -->
+    <!-- vault -->
+    <job name="Advanced standalone-ha configuration - Vault"
+         condition="install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.CustomVault">
+            <arg>--xml-file=standalone-ha.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-ha configuration - Vault"
+         condition="!install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.DefaultVault">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced Configuration - Jdbc"
+         condition="install.cluster.demo|install.businessCentral.datasource|install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Jdbc">
+            <arg>--xml-file=standalone-ha.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Dashbuilder Datasource"
+         condition="install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=standalone-ha.xml</arg>
+            <arg>--text=DashbuilderDatasource</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Business-Central Datasource"
+         condition="install.businessCentral.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=standalone-ha.xml</arg>
+            <arg>--text=BusinessCentralDatasource</arg>
+        </executeclass>
+    </job>
+
+    <!-- security domain -->
+    <job name="Advanced standalone-ha configuration - Security Domain"
+         condition="install.securitydomain">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SecurityDomain">
+            <arg>--xml-file=standalone-ha.xml</arg>
+        </executeclass>
+    </job>
+
+    <!-- Ssl -->
+    <job name="Advanced standalone-ha configuration - Ssl"
+         condition="install.ssl">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Ssl">
+            <arg>--xml-file=standalone-ha.xml</arg>
+        </executeclass>
+    </job>
+
+    <!-- ldap -->
+    <job name="Advanced standalone-ha configuration - LDAP Connection"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapConnection">
+            <arg>--xml-file=standalone-ha.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-ha configuration - LDAP for Management Interfaces"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapSecurityRealm">
+            <arg>--xml-file=standalone-ha.xml</arg>
+        </executeclass>
+    </job>
+
+
+    <!-- end advanced configuration: standalone-ha.xml -->
+
+    <job name="Adding system properties">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--resolve-params=false</arg>
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-system-properties.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring MDB" condition="!standalone-ha.xml.org.jboss.as.messaging.extension.exists">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-mdb-extension.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring MDB">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-mdb-conf.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring JMS Roles">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-jms-role.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring SSO">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-sso-conf.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring logging filters">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-logging-filter.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-ha configuration - LDAP for Business Central"
+        condition="postinstall.server+install.ldap.business.central">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.BxmsSecurityDomain">
+            <arg>--xml-file=standalone-ha.xml</arg>
+        </executeclass>
+    </job>
+
+    <!-- shutdown standalone-ha.xml server execution -->
+    <job name="Shutdown standalone-ha" >
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>standalone</arg>
+        </executeclass>
+    </job>
+
+    <!--standalone-full.xml server execution -->
+    <job name="Starting standalone-full">
+        <os family="unix" />
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}/bin/standalone.sh</arg>
+            <arg>--standalone-config=full</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}/</arg>
+        </executeclass>
+    </job>
+
+    <!--standalone-full.xml server execution windows-->
+    <job name="Starting standalone-full" >
+        <os family="windows" />
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}\bin\standalone.bat</arg>
+            <arg>--standalone-config=full</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}\</arg>
+        </executeclass>
+    </job>
+
+    <job name="Writing KIE server properties">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.kie.server.repo=${jboss.server.data.dir}</arg>
+	</executeclass>
+    </job>
+
+    <job name="Disabling Optaplanner Execution Server" condition="disable.optaplanner">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.optaplanner.server.ext.disabled=true</arg>
+	</executeclass>
+    </job>
+
+    <!-- begin advanced configuration: standalone-full.xml -->
+    <!-- vault -->
+    <job name="Advanced standalone-full configuration - Vault"
+         condition="install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.CustomVault">
+            <arg>--xml-file=standalone-full.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-full configuration - Vault"
+         condition="!install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.DefaultVault">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced Configuration - Jdbc"
+         condition="install.cluster.demo|install.businessCentral.datasource|install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Jdbc">
+            <arg>--xml-file=standalone-full.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Dashbuilder Datasource"
+         condition="install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=standalone-full.xml</arg>
+            <arg>--text=DashbuilderDatasource</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Business-Central Datasource"
+         condition="install.businessCentral.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=standalone-full.xml</arg>
+            <arg>--text=BusinessCentralDatasource</arg>
+        </executeclass>
+    </job>
+
+    <!-- security domain -->
+    <job name="Advanced standalone-full configuration - Security Domain"
+         condition="install.securitydomain">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SecurityDomain">
+            <arg>--xml-file=standalone-full.xml</arg>
+        </executeclass>
+    </job>
+
+    <!-- Ssl -->
+    <job name="Advanced standalone-full configuration - Ssl"
+         condition="install.ssl">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Ssl">
+            <arg>--xml-file=standalone-full.xml</arg>
+        </executeclass>
+    </job>
+    <!-- ldap -->
+    <job name="Advanced standalone-full configuration - LDAP Connection"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapConnection">
+            <arg>--xml-file=standalone-full.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-full configuration - LDAP for Management Interfaces"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapSecurityRealm">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <!-- end advanced configuration: standalone-full.xml -->
+
+    <job name="Adding system properties">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--resolve-params=false</arg>
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-system-properties.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring JMS Roles">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-jms-role.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring MDB">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-mdb-conf-full.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring SSO">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-sso-conf.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring logging filters">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-logging-filter.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-full configuration - LDAP for Business Central"
+        condition="postinstall.server+install.ldap.business.central">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.BxmsSecurityDomain">
+            <arg>--xml-file=standalone-full.xml</arg>
+        </executeclass>
+    </job>
+
+
+    <!-- shutdown standalone-full.xml execution -->
+    <job name="Shutdown standalone-full">
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>standalone</arg>
+        </executeclass>
+    </job>
+
+    <!-- standalone-osgi.xml server execution -->
+    <job name="Starting standalone-osgi">
+        <os family="unix" />
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}/bin/standalone.sh</arg>
+            <arg>--standalone-config=osgi</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}/</arg>
+        </executeclass>
+    </job>
+
+    <!-- standalone-osgi.xml server execution windows-->
+    <job name="Starting standalone-osgi">
+        <os family="windows" />
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}\bin\standalone.bat</arg>
+            <arg>--standalone-config=osgi</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}\</arg>
+        </executeclass>
+    </job>
+
+    <job name="Writing KIE server properties">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.kie.server.repo=${jboss.server.data.dir}</arg>
+	</executeclass>
+    </job>
+
+    <job name="Disabling Optaplanner Execution Server" condition="disable.optaplanner">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.optaplanner.server.ext.disabled=true</arg>
+	</executeclass>
+    </job>
+
+    <!-- begin advanced configuration: standalone-osgi.xml -->
+    <!-- vault -->
+    <job name="Advanced standalone-osgi configuration - Vault"
+         condition="install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.CustomVault">
+            <arg>--xml-file=standalone-osgi.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-osgi configuration - Vault"
+         condition="!install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.DefaultVault">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced Configuration - Jdbc"
+         condition="install.cluster.demo|install.businessCentral.datasource|install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Jdbc">
+            <arg>--xml-file=standalone-osgi.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Dashbuilder Datasource"
+         condition="install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=standalone-osgi.xml</arg>
+            <arg>--text=DashbuilderDatasource</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Business-Central Datasource"
+         condition="install.businessCentral.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=standalone-osgi.xml</arg>
+            <arg>--text=BusinessCentralDatasource</arg>
+        </executeclass>
+    </job>
+
+    <!-- security domain -->
+    <job name="Advanced standalone-osgi configuration - Security Domain"
+         condition="install.securitydomain">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SecurityDomain">
+            <arg>--xml-file=standalone-osgi.xml</arg>
+        </executeclass>
+    </job>
+
+    <!-- Ssl -->
+    <job name="Advanced standalone-osgi configuration - Ssl"
+         condition="install.ssl">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Ssl">
+            <arg>--xml-file=standalone-osgi.xml</arg>
+        </executeclass>
+    </job>
+    <!-- ldap -->
+    <job name="Advanced standalone-osgi configuration - LDAP Connection"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapConnection">
+            <arg>--xml-file=standalone-osgi.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-osgi configuration - LDAP for Management Interfaces"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapSecurityRealm">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <!-- end advanced configuration: standalone-osgi.xml -->
+
+    <job name="Adding system properties">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--resolve-params=false</arg>
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-system-properties.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring MDB" condition="!standalone-osgi.xml.org.jboss.as.messaging.extension.exists">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-mdb-extension.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring MDB">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-mdb-conf.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring JMS Roles">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-jms-role.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring SSO">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-sso-conf.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring logging filters">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-logging-filter.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-osgi configuration - LDAP for Business Central"
+        condition="postinstall.server+install.ldap.business.central">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.BxmsSecurityDomain">
+            <arg>--xml-file=standalone-osgi.xml</arg>
+        </executeclass>
+    </job>
+
+    <!-- shutdown standalone-osgi.xml execution -->
+    <job name="Shutdown standalone-osgi" >
+       <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>standalone</arg>
+        </executeclass>
+    </job>
+
+    <!-- standalone-full-ha.xml execution -->
+    <job name="Starting standalone-full-ha" >
+        <os family="unix" />
+       <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}/bin/standalone.sh</arg>
+            <arg>--standalone-config=full-ha</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}/</arg>
+        </executeclass>
+    </job>
+
+    <!-- standalone-full-ha.xml execution windows -->
+    <job name="Starting standalone-full-ha" >
+        <os family="windows" />
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}\bin\standalone.bat</arg>
+            <arg>--standalone-config=full-ha</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}\</arg>
+        </executeclass>
+    </job>
+
+    <job name="Writing KIE server properties">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.kie.server.repo=${jboss.server.data.dir}</arg>
+	</executeclass>
+    </job>
+
+    <job name="Disabling Optaplanner Execution Server" condition="disable.optaplanner">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.optaplanner.server.ext.disabled=true</arg>
+	</executeclass>
+    </job>
+
+    <!-- begin advanced configuration: standalone-full-ha.xml -->
+    <!-- vault -->
+    <job name="Advanced standalone-full-ha configuration - Vault"
+         condition="install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.CustomVault">
+            <arg>--xml-file=standalone-full-ha.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-full-ha configuration - Vault"
+         condition="!install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.DefaultVault">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced Configuration - Jdbc"
+         condition="install.cluster.demo|install.businessCentral.datasource|install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Jdbc">
+            <arg>--xml-file=standalone-full-ha.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Dashbuilder Datasource"
+         condition="install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=standalone-full-ha.xml</arg>
+            <arg>--text=DashbuilderDatasource</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Business-Central Datasource"
+         condition="install.businessCentral.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=standalone-full-ha.xml</arg>
+            <arg>--text=BusinessCentralDatasource</arg>
+        </executeclass>
+    </job>
+
+    <!-- security domain -->
+    <job name="Advanced standalone-full-ha configuration - Security Domain"
+         condition="install.securitydomain">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SecurityDomain">
+            <arg>--xml-file=standalone-full-ha.xml</arg>
+        </executeclass>
+    </job>
+
+    <!-- Ssl -->
+    <job name="Advanced standalone-full-ha configuration - Ssl"
+         condition="install.ssl">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Ssl">
+            <arg>--xml-file=standalone-full-ha.xml</arg>
+        </executeclass>
+    </job>
+    <!-- ldap -->
+    <job name="Advanced standalone-full-ha configuration - LDAP Connection"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapConnection">
+            <arg>--xml-file=standalone-full-ha.xml</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-full-ha configuration - LDAP for Management Interfaces"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapSecurityRealm">
+            <arg>--xml-file=standalone.xml</arg>
+        </executeclass>
+    </job>
+
+
+    <!-- end advanced configuration: standalone-full-ha.xml -->
+
+    <job name="Adding system properties">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--resolve-params=false</arg>
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-system-properties.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring JMS Roles">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-jms-role.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring MDB">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-mdb-conf-full.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring SSO">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-sso-conf.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced standalone-full-ha configuration - LDAP for Business Central"
+        condition="postinstall.server+install.ldap.business.central">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.BxmsSecurityDomain">
+            <arg>--xml-file=standalone-full-ha.xml</arg>
+        </executeclass>
+    </job>
+    <!--<job name="Configuring logging filters">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>-script=${INSTALL_PATH}/cli-scripts/add-logging-filter.cli</arg>
+        </executeclass>
+    </job>-->
+
+    <!-- shutdown standalone-full-ha.xml execution -->
+    <job name="Shutdown standalone-full-ha" >
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>standalone</arg>
+        </executeclass>
+    </job>
+
+    <!-- domain.xml server execution -->
+    <job name="Starting domain">
+        <os family="unix" />
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}/bin/domain.sh</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}/</arg>
+        </executeclass>
+    </job>
+
+    <!-- domain.xml server execution Windows -->
+    <job name="Starting domain" >
+        <os family="windows" />
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--postinstall-script=${INSTALL_PATH}\bin\domain.bat</arg>
+            <arg>--attempts=10</arg>
+            <arg>ManagementRealm</arg>
+            <arg>${INSTALL_PATH}\</arg>
+        </executeclass>
+    </job>
+
+    <job name="Writing KIE server properties">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.kie.server.repo=${jboss.server.data.dir}</arg>
+	</executeclass>
+    </job>
+
+    <job name="Disabling Optaplanner Execution Server" condition="disable.optaplanner">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetStandaloneServerProperties">
+	    <arg>org.optaplanner.server.ext.disabled=true</arg>
+	</executeclass>
+    </job>
+
+    <!-- begin advanced configuration: domain -->
+
+    <!-- vault -->
+    <job name="Advanced domain configuration - Vault"
+         condition="install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.CustomVault">
+        <arg>--xml-file=host.xml</arg>
+        <arg>--is-domain=true</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced domain configuration - Vault"
+         condition="!install.vault">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.DefaultVault">
+            <arg>--xml-file=host.xml</arg>
+            <arg>--is-domain=true</arg>
+        </executeclass>
+    </job>
+
+    <!-- jdbc -->
+    <job name="Advanced Configuration - Jdbc"
+         condition="install.cluster.demo|install.businessCentral.datasource|install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Jdbc">
+            <arg>--xml-file=host.xml</arg>
+            <arg>--is-domain=true</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Dashbuilder Datasource"
+         condition="install.dashbuilder.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=host.xml</arg>
+            <arg>--is-domain=true</arg>
+            <arg>--text=DashbuilderDatasource</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced configuration - Business-Central Datasource"
+         condition="install.businessCentral.datasource">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Datasource">
+            <arg>--xml-file=host.xml</arg>
+            <arg>--is-domain=true</arg>
+            <arg>--text=BusinessCentralDatasource</arg>
+        </executeclass>
+    </job>
+
+    <!-- security domain -->
+    <job name="Advanced domain configuration - Security Domain"
+         condition="install.securitydomain">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SecurityDomain">
+            <arg>--xml-file=host.xml</arg>
+            <arg>--is-domain=true</arg>
+        </executeclass>
+    </job>
+
+    <!-- Ssl -->
+    <job name="Advanced domain configuration - Ssl"
+         condition="install.ssl">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.Ssl">
+            <arg>--xml-file=host.xml</arg>
+            <arg>--is-domain=true</arg>
+        </executeclass>
+    </job>
+
+    <!-- ldap -->
+    <job name="Advanced domain configuration - LDAP Connection"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapConnection">
+            <arg>--xml-file=host.xml</arg>
+            <arg>--is-domain=true</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced domain configuration - LDAP Management Console Configuration"
+         condition="postinstall.server+install.ldap.mgmt.console">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.LdapSecurityRealm">
+            <arg>--xml-file=host.xml</arg>
+            <arg>--is-domain=true</arg>
+        </executeclass>
+    </job>
+
+    <job name="Advanced domain configuration - LDAP for Business Central"
+        condition="postinstall.server+install.ldap.business.central">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.BxmsSecurityDomain">
+            <arg>--xml-file=host.xml</arg>
+            <arg>--is-domain=true</arg>
+        </executeclass>
+    </job>
+    
+    <job name="Add quartz datasource definitions" condition="postinstall.server+install.cluster.demo">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.AddQuartzDatasources"/>
+    </job>
+
+    <job name="Configure server properties for server-one domain deployment">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetDomainServerProperties">
+	    <arg>server-one</arg>
+    	    <arg>org.uberfire.nio.git.dir=${INSTALL_PATH}/domain/data/nodeone-nio</arg>
+    	    <arg>org.uberfire.metadata.index.dir=${INSTALL_PATH}/domain/data/nodeone-metadata</arg>
+	    <arg>org.uberfire.nio.git.ssh.cert.dir=${INSTALL_PATH}/domain/data/nodeone-ssh</arg>
+	    <arg>org.uberfire.nio.git.daemon.host=localhost</arg>
+	    <arg>org.uberfire.nio.git.daemon.port=9417</arg>
+    	    <arg>org.uberfire.nio.git.daemon.hostport=9417</arg>
+	    <arg>org.uberfire.nio.git.ssh.host=localhost</arg>
+	    <arg>org.uberfire.nio.git.ssh.port=8002</arg>
+	    <arg>org.uberfire.nio.git.ssh.hostport=8002</arg>
+	    <arg>org.guvnor.m2repo.dir=${INSTALL_PATH}/domain/data/shared-m2-repo</arg>
+	</executeclass>
+    </job>
+
+    <job name="Configure server properties for server-one clustered configuration" condition="install.cluster.demo">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetDomainServerProperties">
+	    <arg>server-one</arg>
+	    <arg>jboss.node.name=nodeOne</arg>
+	    <arg>org.quartz.properties=${jboss.home.dir}/domain/configuration/quartz-definition.properties</arg>
+	    <arg>org.uberfire.cluster.autostart=true</arg>
+	    <arg>org.uberfire.cluster.id=bpms-cluster</arg>
+	    <arg>org.uberfire.cluster.zk=&quot;localhost:2181,localhost:2182,localhost:2183&quot;</arg>
+	    <arg>org.uberfire.cluster.local.id=nodeOne_12345</arg>
+	    <arg>org.uberfire.cluster.vfs.lock=vfs-repo</arg>
+	</executeclass>
+    </job>
+
+    <job name="Configure server properties for server-two domain deployment">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetDomainServerProperties">
+	    <arg>server-two</arg>
+    	    <arg>org.uberfire.nio.git.dir=${INSTALL_PATH}/domain/data/nodetwo-nio</arg>
+    	    <arg>org.uberfire.metadata.index.dir=${INSTALL_PATH}/domain/data/nodetwo-metadata</arg>
+	    <arg>org.uberfire.nio.git.ssh.cert.dir=${INSTALL_PATH}/domain/data/nodetwo-ssh</arg>
+	    <arg>org.uberfire.nio.git.daemon.host=localhost</arg>
+	    <arg>org.uberfire.nio.git.daemon.port=9418</arg>
+	    <arg>org.uberfire.nio.git.daemon.hostport=9418</arg>
+	    <arg>org.uberfire.nio.git.ssh.host=localhost</arg>
+	    <arg>org.uberfire.nio.git.ssh.port=8003</arg>
+	    <arg>org.uberfire.nio.git.ssh.hostport=8003</arg>
+	    <arg>org.guvnor.m2repo.dir=${INSTALL_PATH}/domain/data/shared-m2-repo</arg>
+	</executeclass>
+    </job>
+
+    <job name="Configure server properties for server-two clustered configuration" condition="install.cluster.demo">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.SetDomainServerProperties">
+	    <arg>server-two</arg>
+	    <arg>jboss.node.name=nodeTwo</arg>
+	    <arg>org.quartz.properties=${jboss.home.dir}/domain/configuration/quartz-definition.properties</arg>
+	    <arg>org.uberfire.cluster.autostart=true</arg>
+	    <arg>org.uberfire.cluster.id=bpms-cluster</arg>
+	    <arg>org.uberfire.cluster.zk=&quot;localhost:2181,localhost:2182,localhost:2183&quot;</arg>
+	    <arg>org.uberfire.cluster.local.id=nodeTwo_12346</arg>
+	    <arg>org.uberfire.cluster.vfs.lock=vfs-repo</arg>
+	</executeclass>
+    </job>
+
+    <job name="Create business-central war">
+	<executeclass name="com.redhat.installer.installation.processpanel.CommandRunner">
+	    <arg>jar</arg>
+	    <arg>cf</arg>
+	    <arg>${INSTALL_PATH}/domain/business-central.war</arg>
+	    <arg>-C</arg>
+            <arg>${INSTALL_PATH}/standalone/deployments/business-central.war/</arg>
+	    <arg>.</arg>
+	</executeclass>
+    </job>
+
+    <job name="Create dashbuilder.war">
+	<executeclass name="com.redhat.installer.installation.processpanel.CommandRunner">
+	    <arg>jar</arg>
+	    <arg>cf</arg>
+	    <arg>${INSTALL_PATH}/domain/dashbuilder.war</arg>
+	    <arg>-C</arg>
+            <arg>${INSTALL_PATH}/standalone/deployments/dashbuilder.war/</arg>
+	    <arg>.</arg>
+	</executeclass>
+    </job>
+
+    <job name="Create kie-server.war">
+	<executeclass name="com.redhat.installer.installation.processpanel.CommandRunner">
+	    <arg>jar</arg>
+	    <arg>cf</arg>
+	    <arg>${INSTALL_PATH}/domain/kie-server.war</arg>
+	    <arg>-C</arg>
+            <arg>${INSTALL_PATH}/standalone/deployments/kie-server.war/</arg>
+	    <arg>.</arg>
+	</executeclass>
+    </job>
+
+    <job name="Deploy business-central.war">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.DeployArtifact">
+	    <arg>--path=${INSTALL_PATH}/domain/business-central.war</arg>
+	</executeclass>
+    </job>
+
+    <job name="Deploy dashbuilder.war">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.DeployArtifact">
+	    <arg>--path=${INSTALL_PATH}/domain/dashbuilder.war</arg>
+	</executeclass>
+    </job>
+
+    <job name="Deploy kie-server.war">
+	<executeclass name="com.redhat.installer.asconfiguration.processpanel.postinstallation.DeployArtifact">
+	    <arg>--path=${INSTALL_PATH}/domain/kie-server.war</arg>
+	</executeclass>
+    </job>
+
+    <!-- end advanced configuration: domain -->
+
+    <job name="Adding system properties">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--resolve-params=false</arg>
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-system-properties.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring MDB">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-mdb-conf-domain.cli</arg>
+        </executeclass>
+    </job>
+
+
+    <job name="Configuring JMS roles">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-jms-role-domain.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Configuring SSO">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.CliScriptHelper">
+            <arg>--script=${INSTALL_PATH}/cli-scripts/add-sso-conf-domain.cli</arg>
+        </executeclass>
+    </job>
+
+    <job name="Shutdown domain">
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>domain</arg>
+        </executeclass>
+    </job>
+
+    <job name="Cleanup">
+        <executeclass name="com.redhat.installer.asconfiguration.processpanel.PropertiesSetter">
+            <arg>${INSTALL_PATH}/standalone/configuration/logging.properties</arg>
+            <arg>handler.FILE.fileName=${org.jboss.boot.log.file:boot.log}</arg>
+        </executeclass>
+    </job>
+
+    <!--  The following two server shutdowns only run in the event of a failure in processes somewhere. -->
+     <job name="Onfail Server Shutdown Job" onfail="true">
+        <executeclass name="com.redhat.installer.asconfiguration.ascontroller.ServerManager">
+            <arg>--failmode=true</arg>
+        </executeclass>
+    </job>
+
+    <job name="Copy server logs" final="true">
+        <executeclass name="com.redhat.installer.installation.processpanel.FileMover">
+	    <arg>--copy=true</arg>
+            <arg>--enable-messages=true</arg>
+            <arg>--source=${INSTALL_PATH}/standalone/log/server.log</arg>
+            <arg>--source=${INSTALL_PATH}/domain/log/host-controller.log</arg>
+            <arg>--source=${INSTALL_PATH}/domain/log/process-controller.log</arg>
+            <arg>--destination=${INSTALL_PATH}/installation/server-logs/</arg>
+        </executeclass>
+    </job>
+</processing>

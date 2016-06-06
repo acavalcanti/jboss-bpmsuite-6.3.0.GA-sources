@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<installation version="1.0">
+<!-- The packs under the group "Core" that are referenced in install.xml  -->
+
+<!--
+
+     NOTE: Even though the description and name of the pack are specified here,
+           the installer is actually reading those attributes from the langpack.
+
+           I [dcheung] could not remove the name and description attributes from 
+           the pack section since IzPack complains about that and leaving them
+           blank produces strange behaviours, like required packs are not faded etc.
+
+           If you current intern can fix that, please accept a big apology from me
+           for doing that mess but also pleaase accept a Thank You from me for actually
+           reading this comment and fixing it! 
+
+-->
+
+<packs>
+
+    <pack name="Red Hat JBoss BRMS Platform" id="brms" required="yes">
+        <description>JBoss BRMS 6. This pack contains files that overwrite EAP files.</description>
+        <fileset dir="${brms.bin.loc}"
+                 targetdir="${INSTALL_PATH}/"
+                 override="true">
+            <include name="**/*"/>
+            <exclude name="patches-applied.txt"/>
+        </fileset>
+    </pack>
+    <pack name="Red Hat JBoss BRMS Supplementary tools" id="BRMS-Tools" required="no" condition="install.cluster.demo" preselected="no">
+        <description>JBoss BRMS supplementary tools. This pack contains tools that allow clustering and other tools.</description>
+        <fileset dir="${supp.bin.loc}"
+                 targetdir="${INSTALL_PATH}/${supp.dir.name}/"
+                 override="true">
+            <include name="**/*"/>
+	    <exclude name="zookeeper/"/>
+        </fileset>
+        <singlefile src="${izpack.singlefile.dir}/startCluster.sh" target="${INSTALL_PATH}/${supp.dir.name}/helix-core/startCluster.sh" os="unix"/>
+        <singlefile src="${izpack.singlefile.dir}/startCluster.bat" target="${INSTALL_PATH}/${supp.dir.name}/helix-core/startCluster.bat" os="windows"/>
+        <parsable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/startCluster.sh" stage="never" os="unix" />
+        <parsable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/startCluster.bat" stage="never" os="windows" />
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/startCluster.bat" stage="never" os="windows"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/startCluster.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/helix-admin.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/JmxDumper.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/quickstart.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/run-helix-controller.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/start-helix-participant.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/start-standalone-zookeeper.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/test-util.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/yaml-cluster-setup.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/zkcopy.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/zk-dumper.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/zkgrep.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/zk-log-csv-formatter.sh" stage="never" os="unix"/>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/helix-core/bin/zk-log-parser.sh" stage="never" os="unix"/>
+	<singlefile src="${izpack.singlefile.dir}/quartz-definition.properties" target="${INSTALL_PATH}/domain/configuration/quartz-definition.properties"/>
+    </pack>
+    <pack name="First zooKeeper instance" id="ZooKeeper-one" condition="install.cluster.demo" required="no" preselected="no">
+        <description>This pack contains the first zookeeper installation, which allows for clustering of the VFS.</description>
+	<fileset dir="${supp.bin.loc}/zookeeper"
+		 targetdir="${INSTALL_PATH}/${supp.dir.name}/zookeeper-one"
+		 override="true">
+	    <include name="**/*"/>
+	</fileset>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-one/bin/zkCleanup.sh" stage="never" os="unix" />
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-one/bin/zkCli.sh" stage="never" os="unix" />
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-one/bin/zkEnv.sh" stage="never" os="unix" />
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-one/bin/zkServer.sh" stage="never" os="unix" />
+    </pack>
+    <pack name="Second zooKeeper instance" id="ZooKeeper-two" condition="install.cluster.demo" required="no" preselected="no">
+        <description>This pack contains the second zookeeper installation, which allows for clustering of the VFS.</description>
+	<fileset dir="${supp.bin.loc}/zookeeper"
+		 targetdir="${INSTALL_PATH}/${supp.dir.name}/zookeeper-two"
+		 override="true">
+	    <include name="**/*"/>
+	</fileset>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-two/bin/zkCleanup.sh" stage="never" os="unix" />
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-two/bin/zkCli.sh" stage="never" os="unix" />
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-two/bin/zkEnv.sh" stage="never" os="unix" />
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-two/bin/zkServer.sh" stage="never" os="unix" />
+    </pack>
+    <pack name="Third zooKeeper instance" id="ZooKeeper-three" condition="install.cluster.demo" required="no" preselected="no">
+        <description>This pack contains the third zookeeper installation, which allows for clustering of the VFS.</description>
+	<fileset dir="${supp.bin.loc}/zookeeper"
+		 targetdir="${INSTALL_PATH}/${supp.dir.name}/zookeeper-three"
+		 override="true"> <include name="**/*"/>
+	</fileset>
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-three/bin/zkCleanup.sh" stage="never" os="unix" />
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-three/bin/zkCli.sh" stage="never" os="unix" />
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-three/bin/zkEnv.sh" stage="never" os="unix" />
+        <executable targetfile="${INSTALL_PATH}/${supp.dir.name}/zookeeper-three/bin/zkServer.sh" stage="never" os="unix" />
+    </pack>
+</packs>
+</installation>

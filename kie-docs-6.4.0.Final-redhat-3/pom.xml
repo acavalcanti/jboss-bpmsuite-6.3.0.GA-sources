@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+~ Copyright 2015 Red Hat, Inc. and/or its affiliates
+~
+~ Licensed under the Apache License, Version 2.0 (the "License");
+~ you may not use this file except in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~       http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing, software
+~ distributed under the License is distributed on an "AS IS" BASIS,
+~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~ See the License for the specific language governing permissions and
+~ limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-parent-with-dependencies</artifactId>
+    <version>6.4.0.Final-redhat-3</version>
+  </parent>
+
+  <artifactId>kie-docs</artifactId>
+
+  <packaging>pom</packaging>
+
+  <version>6.4.0.Final-redhat-3</version>
+  <name>KIE :: Documentation</name>
+  <description>KIE Documentation</description>
+
+  <scm>
+    <connection>scm:git:git@github.com:droolsjbpm/kie-docs.git</connection>
+    <developerConnection>scm:git:git@github.com:droolsjbpm/kie-docs.git</developerConnection>
+    <url>https://github.com/droolsjbpm/kie-docs</url>
+  </scm>
+
+  <modules>
+    <module>kie-docs-code</module>
+    <module>drools-docs</module>
+    <module>optaplanner-wb-es-docs</module>
+    <module>jbpm-docs</module>
+    <module>jbpm-asciidocs</module>
+    <module>dashbuilder-docs</module>
+  </modules>
+
+  <dependencies>
+    <dependency>
+      <!-- Necessary because this is excluded by the maven-jdocbook-plugin, although we need it for conditional processing
+           See: https://github.com/pressgang/maven-jdocbook-plugin/blob/maven-jdocbook-plugin-2.3.9/pom.xml#L194-L208
+           See: https://github.com/pressgang/jdocbook-core/issues/13
+       -->
+      <groupId>net.sf.docbook</groupId>
+      <artifactId>docbook-xsl</artifactId>
+      <classifier>resources</classifier>
+      <type>zip</type>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-xsl-sources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>net.sf.docbook</groupId>
+                  <artifactId>docbook-xsl</artifactId>
+                  <classifier>resources</classifier>
+                  <type>zip</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/xsl</outputDirectory>
+                  <includes>**/*.xsl</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resources-pdf</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/docbook/staging/images/images</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/../shared/images/</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-xsl-to-docbook</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/docbook/staging/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/xsl/docbook/</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>project-sources-maven-plugin</artifactId>
+        <version>0.3</version>
+        <executions>
+          <execution>
+            <id>project-sources-archive</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>archive</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+ 
+  <!--  move to droolsjbpm-build-bootstrap --> 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-docs-code</artifactId>
+        <version>6.4.0.Final-redhat-3</version>
+        <classifier>examples</classifier>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <profiles>
+    <profile>
+      <id>community</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.jboss.maven.plugins</groupId>
+              <artifactId>maven-jdocbook-plugin</artifactId>
+              <configuration>
+                <profiling>
+                  <enabled>true</enabled>
+                  <attributeName>condition</attributeName>
+                  <attributeValue>COMMUNITY-ONLY</attributeValue>
+                </profiling>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <profile>
+      <id>productized</id>
+      <activation>
+        <property>
+          <name>productized</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.jboss.maven.plugins</groupId>
+              <artifactId>maven-jdocbook-plugin</artifactId>
+              <configuration>
+                <profiling>
+                  <enabled>true</enabled>
+                  <attributeName>condition</attributeName>
+                  <attributeValue>PRODUCT-ONLY</attributeValue>
+                </profiling>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+</project>
+<!--
+Modified by POM Manipulation Extension for Maven 1.17 ( SHA: 89482a03 ) 
+-->
+

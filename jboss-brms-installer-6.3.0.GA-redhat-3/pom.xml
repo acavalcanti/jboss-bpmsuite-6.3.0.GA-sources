@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ~ JBoss, Home of Professional Open Source. ~ Copyright 2011, Red Hat, 
+    Inc., and individual contributors ~ as indicated by the @author tags. See 
+    the copyright.txt file in the ~ distribution for a full listing of individual 
+    contributors. ~ ~ This is free software; you can redistribute it and/or modify 
+    it ~ under the terms of the GNU Lesser General Public License as ~ published 
+    by the Free Software Foundation; either version 2.1 of ~ the License, or 
+    (at your option) any later version. ~ ~ This software is distributed in the 
+    hope that it will be useful, ~ but WITHOUT ANY WARRANTY; without even the 
+    implied warranty of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+    See the GNU ~ Lesser General Public License for more details. ~ ~ You should 
+    have received a copy of the GNU Lesser General Public ~ License along with 
+    this software; if not, write to the Free ~ Software Foundation, Inc., 51 
+    Franklin St, Fifth Floor, Boston, MA ~ 02110-1301 USA, or see the FSF site: 
+    http://www.fsf.org. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jboss</groupId>
+        <artifactId>jboss-parent</artifactId>
+        <version>11</version>
+    </parent>
+
+    <groupId>org.jboss.installer</groupId>
+    <artifactId>jboss-brms-installer</artifactId>
+    <version>6.3.0.GA-redhat-3</version>
+    <name>Red Hat JBoss BRMS Installer</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <common.basedir>${basedir}/..</common.basedir>
+        <version.org.dashbuilder>0.4.0.Final-redhat-3</version.org.dashbuilder>
+        <common.build.directory>${common.basedir}/target</common.build.directory>
+
+        <!-- Project related variables -->
+        <author.name>JBoss</author.name>
+        <platform.name>BRMS</platform.name>
+        <platform.name.lower>brms</platform.name.lower>
+
+    <!-- Required by install.xml -->
+        <common.product.name>eap</common.product.name>
+        <version.major>6</version.major>
+        <version.minor>4</version.minor>
+        <version.micro>0</version.micro>
+        <version.org.uberfire.ext>0.8.0.Final-redhat-3</version.org.uberfire.ext>
+        <version.designation>GA</version.designation>
+        <recommended.version.major>6</recommended.version.major>
+        <recommended.version.minor>4</recommended.version.minor>
+        <recommended.version.micro>6</recommended.version.micro>
+        <version.org.kie>6.4.0.Final-redhat-3</version.org.kie>
+        <recommended.version.designation>GA</recommended.version.designation>
+        <release.version.short>${version.major}.${version.minor}</release.version.short>
+        <release.version.full>${release.version.short}.${version.micro}</release.version.full>
+        <common.eap.name>jboss-${common.product.name}-${release.version.short}</common.eap.name>
+
+        <version.brms>6.3.0</version.brms>
+
+        <version.org.kie.workbench.app>6.3.0.GA</version.org.kie.workbench.app>
+
+        <version.org.jboss.errai.cdi10-compatible>3.0.6.Final-redhat-1</version.org.jboss.errai.cdi10-compatible>
+        <version.org.jboss.bom.brms>6.3.0.GA-redhat-3</version.org.jboss.bom.brms>
+        <jboss.dist.version>7.5.7.Final-redhat-3</jboss.dist.version>
+        <version.org.uberfire>0.8.0.Final-redhat-3</version.org.uberfire>
+        <eap.bin.dir>${basedir}/target/zips/eap-dist</eap.bin.dir>
+        <eap.bin.loc>${eap.bin.dir}/${common.eap.name}</eap.bin.loc>
+        <brms.bin.dir>${basedir}/target/zips/brms-dist</brms.bin.dir>
+        <brms.bin.loc>${brms.bin.dir}/${common.eap.name}</brms.bin.loc>
+        <supp.bin.dir>${basedir}/target/zips/supp-dist</supp.bin.dir>
+        <supp.dir.name>jboss-brms-bpmsuite-6.3-supplementary-tools</supp.dir.name>
+        <supp.bin.loc>${supp.bin.dir}/${supp.dir.name}</supp.bin.loc>
+    <!--COMMON -->
+        <installer.bin.dir>${basedir}/target/zips/installer-dist</installer.bin.dir>
+        <version.org.jboss.errai>3.2.3.Final-redhat-1</version.org.jboss.errai>
+        <izpack.config.dir>${basedir}/installer</izpack.config.dir>
+        <izpack.singlefile.dir>${izpack.config.dir}/singlefiles</izpack.singlefile.dir>
+        <version.org.jboss.integration-platform>6.0.6.Final-redhat-1</version.org.jboss.integration-platform>
+        <izpack.config.dir.parsed>${basedir}/target/parsed</izpack.config.dir.parsed>
+        <version.fuse.eap>6.2.1.redhat-084</version.fuse.eap>
+
+        <izpack.compiler.bin>${installer.bin.dir}/standalone-compiler.jar</izpack.compiler.bin>
+
+    <!-- IzPack Localization -->
+        <izpack.localization>${izpack.config.dir}/localization</izpack.localization>
+        <izpack.langpacks.loc>${izpack.localization}/langpacks</izpack.langpacks.loc>
+        <version.org.mvel>2.2.8.Final-redhat-1</version.org.mvel>
+        <izpack.unix.shortcuts.loc>${izpack.localization}/unix_shortcut</izpack.unix.shortcuts.loc>
+        <izpack.windows.shortcuts.loc>${izpack.localization}/windows_shortcut</izpack.windows.shortcuts.loc>
+        <version.org.jboss.as>7.5.7.Final-redhat-3</version.org.jboss.as>
+    </properties>
+
+    <dependencyManagement></dependencyManagement>
+
+    <build>
+     <!-- Building the installer using izpack -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+        <!-- Get the eap-dist zip -->
+                <executions>
+          <!-- Get the brms-dist zip -->
+                    <execution>
+                        <id>copyBrms</id>
+                        <phase>validate</phase>
+                        <goals>
+                           <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.jboss.ip</groupId>
+                                    <artifactId>jboss-brms</artifactId>
+                                    <classifier>installer-eap6.x</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${brms.bin.dir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+
+                    <!-- Get the supplementary tools -->
+                    <execution>
+                        <id>copySupplementaryTools</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.jboss.ip</groupId>
+                                    <artifactId>jboss-brms-bpmsuite</artifactId>
+                                    <classifier>supplementary-tools</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${supp.bin.dir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+
+          <!-- Get installer-commons jar-->
+                    <execution>
+                        <id>copyCommonInstaller</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.jboss.installer</groupId>
+                                    <artifactId>installer-commons</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${installer.bin.dir}</outputDirectory>
+                                   <destFileName>installer-commons.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                       </configuration>
+                   </execution>
+                   <!-- get standalone compiler -->
+                   <execution>
+                       <id>copyStandaloneCompiler</id>
+                       <phase>validate</phase>
+                       <goals>
+                           <goal>copy</goal>
+                       </goals>
+                       <configuration>
+                           <artifactItems>
+                               <artifactItem>
+                                   <groupId>org.codehaus.izpack</groupId>
+                                   <artifactId>izpack-standalone-compiler</artifactId>
+                                   <type>jar</type>
+                                   <overWrite>true</overWrite>
+                                   <outputDirectory>${installer.bin.dir}</outputDirectory>
+                                   <destFileName>standalone-compiler.jar</destFileName>
+                               </artifactItem>
+                           </artifactItems>
+                       </configuration>
+                   </execution>
+                </executions>
+            </plugin>
+            <!-- Building the installer using izpack -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>izpack</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <tasks>
+                                <taskdef name="IzPack" classpath="${izpack.compiler.bin}" classname="com.izforge.izpack.ant.IzPackTask"></taskdef>
+                                <IzPack input="${izpack.config.dir.parsed}/install.xml" output="target/${project.artifactId}-${project.version}.jar" installerType="standard" basedir="${izpack.config.dir.parsed}"></IzPack>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>directories</id>
+                        <phase>validate</phase>
+                        <configuration>
+                            <tasks>
+                                <delete dir="${izpack.config.dir.parsed}"></delete>
+                                <mkdir dir="${izpack.config.dir.parsed}"></mkdir>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${basedir}/target/executables/"></mkdir>
+                                <copy file="${basedir}/installer/scripts/runElevated/run.exe" todir="${basedir}/target/executables/"></copy>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>project-sources-maven-plugin</artifactId>
+        <version>0.3</version>
+        <executions>
+          <execution>
+            <id>project-sources-archive</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>archive</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+        </plugins>
+
+        <!-- Files that need to be parsed by maven. The parsed files are placed 
+            into the izpack.config.dir.parsed folder -->
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>${izpack.config.dir}</directory>
+                <includes>
+                    <include>install.xml</include>
+                    <include>variables.xml</include>
+                    <include>userInputSpec.xml</include>
+                    <include>ProcessPanel.Spec.xml</include>
+                    <include>core-packs.xml</include>
+                    <include>target-panel.xml</include>
+                    <include>extra-jobs.xml</include>
+                    <include>extra-guiprefs.xml</include>
+                    <include>layers-variables.xml</include>
+                    <include>uninstaller.xml</include>
+                    <include>conditions.xml</include>
+                    <include>resources.xml</include>
+                </includes>
+                <targetPath>${izpack.config.dir.parsed}</targetPath>
+            </resource>
+      <!-- General XML Files -->
+            <resource>
+                <filtering>true</filtering>
+                <!-- common unix shortcuts -->
+                <directory>${izpack.unix.shortcuts.loc}</directory>
+                <includes>
+                    <include>*.xml</include>
+                </includes>
+                <targetPath>${izpack.config.dir.parsed}/unix-shortcuts</targetPath>
+            </resource>
+            <resource>
+                <filtering>true</filtering>
+                <!-- common windows shortcuts -->
+                <directory>${izpack.windows.shortcuts.loc}</directory>
+                <includes>
+                    <include>*.xml</include>
+                </includes>
+                <targetPath>${izpack.config.dir.parsed}/windows-shortcuts</targetPath>
+            </resource>
+            <resource>
+                <filtering>true</filtering>
+                <!-- common langpacks -->
+                <directory>${izpack.langpacks.loc}</directory>
+                <includes>
+                    <include>*.xml</include>
+                </includes>
+                <targetPath>${izpack.config.dir.parsed}/langpacks</targetPath>
+            </resource>
+        </resources>
+    </build>
+
+    <!-- Dependency list. -->
+    <dependencies>
+        <dependency>
+            <groupId>org.codehaus.izpack</groupId>
+            <artifactId>izpack-standalone-compiler</artifactId>
+            <version>4.3.27.redhat-1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.ip</groupId>
+            <artifactId>jboss-brms</artifactId>
+            <version>${version.org.jboss.bom.brms}</version>
+            <classifier>installer-eap6.x</classifier>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.ip</groupId>
+            <artifactId>jboss-brms-bpmsuite</artifactId>
+            <version>${version.org.jboss.bom.brms}</version>
+            <classifier>supplementary-tools</classifier>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.installer</groupId>
+            <artifactId>installer-commons</artifactId>
+            <version>1.4.36.redhat-1</version>
+        </dependency>
+    </dependencies>
+</project>
+<!--
+Modified by POM Manipulation Extension for Maven 1.17 ( SHA: 89482a03 ) 
+-->
+

@@ -1,0 +1,178 @@
+= JBoss Integration Platform Parent and BOM
+:toc:
+
+Parent and Bill Of Materials for SwitchYard, Drools, OptaPlanner, jBPM, ModeShape, Overlord, ...
+
+== Goal
+
+Align the dependencies of the Integration Platform projects early on in the development lifecycle.
+
+== Building
+
+----
+$ mvn clean install
+----
+
+== Usage
+
+The BOM may be imported into your dependency management, for example a https://repository.jboss.org/nexus/index.html#nexus-search;gav\~org.jboss.integration-platform[release version] or a https://jenkins.mw.lab.eng.bos.redhat.com/hudson/job/jboss-integration-platform-bom/[SNAPSHOT deployed by Jenkins].
+
+----
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.integration-platform</groupId>
+            <artifactId>jboss-integration-platform-bom</artifactId>
+            <version>6.0.0-SNAPSHOT</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+----
+
+Any dependencies should be placed in the dependency management in jboss-integration-platform-bom. Explicit versions should not be used; instead use a property which should be placed in jboss-integration-platform-parent.
+
+Your project should inherit:
+
+----
+<parent>
+    <groupId>org.jboss.integration-platform</groupId>
+    <artifactId>jboss-integration-platform-parent</artifactId>
+    <version>6.0.0-SNAPSHOT</version>
+</parent>
+----
+
+By inheriting the jboss-integration-platform-parent:
+
+* The properties used by the BOM are visible to the project.
+
+* It inherits from org.jboss:jboss-parent:16.
+
+* Any further plugin alignments (e.g. GWT) may be done here.
+
+
+== Governance
+
+Discussion mailing list: +jboss-integration-platform-developers+
+
+Any project lead of the Integration Platform (IP) project can change or release the BOM as he/she sees fit,
+provided that the following rules have been taken into account:
+
+=== Adding/changing a dependency
+
+When you want to add or change a dependency X:
+
+. Send in a pull request (PR) with the changes you propose.
+
+. All project leads will review the changes and *_acknowledge the PR in principle_*,
+which means they have the intention to accept the change.
+
+    ** A project lead will normally not actually test the changes on his project (as that's not practical):
+    So he reserves the right to submit a pull request to revert the changes later on.
+
+    ** Most projects do not depend on the bom's +SNAPSHOT+ directly, to avoid sudden surprises.
+    Instead they depend on a released version or on a timestamped snapshot (from
+    https://repository.jboss.org/nexus/content/groups/public/org/jboss/integration-platform/jboss-integration-platform-bom/6.0.0-SNAPSHOT/[this list]).
+    They then update their bom dependency's version frequently, after testing the impact locally.
+
+    ** ACK's are done by commenting on the PR, not on the mailing list.
+
+    ** If a project lead (or his deputy) doesn't acknowledge in reasonable time, chase him for an answer.
+
+    ** Any project lead can reject the PR if he gives a good reason.
+
+        *** On the +master+ branch, no PR can be rejected due to time concerns (deadlines, no time to review, PTO, ...)
+        because any project/product that is about to release should be using the release branch.
+
+. After all project leads have acknowledge the PR in principle, merge the changes.
+
+IMPORTANT: *EAP always wins*: The BOM targets a specific EAP version.
+If that EAP version already depends on X, then the BOM must use the same version as EAP.
+The version properties defined in the BOM should follow pattern version.$groupId. If version.$groupId can't represent the unique version, please use version.$groupId.$artifactId.
+For jboss spec artifacts, please use version.$groupId.$artifactId because there are specification versions in $artifactId.
+For example:
+<version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>1.0.2.Final</version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>
+
+NOTE: The most recent and released version of EAP is available at: http://download.devel.redhat.com/released/JBEAP-6/.
+During development it could be of interest to test against release candidates. These can be downloaded here: http://download.devel.redhat.com/devel/candidates/JBEAP (latest version)  
+
+
+
+IMPORTANT: In the public bom, a dependency version must _never_ end with +-redhat-0+, +-redhat-1+, etc.
+The public bom cannot depend on productization builds,
+as anyone should be able to build all its dependencies from source.
+
+NOTE: When adding a dependency and version property, the preferred format for the version property is `version.groupId`
+
+NOTE: During conflicts, (all things being equal) prefer the latest and greatest version of a dependency in the BOM.
+
+=== Exclusions policy
+
+Dependency exclusions should be avoided, because they cannot be overwritten by child poms.
+
+*A dependency exclusion is only allowed to fix an undisputed bug in the dependency's pom.*
+All IP developers needs to unanimous (undisputed) to keep the exclusion.
+So as soon as 1 IP developer calls for the removal of an exclusion, he/she can immediately remove it.
+
+=== Branching policy
+
+The +master+ branch is never released. Release are done from a release branch.
+The integration platform has multiple projects, but they use the same bom.
+So there are no parallel release branches. There is only 1 latest release branch.
+
+The release branch names simply increment the minor version number.
+The correlation between the bom version and project/product versions is below in the section "version mapping".
+
+=== Version numbering
+
+This BOM has it's own version numbering and release lifecycle.
+Any similarity with Drools, jBPM or SwitchYard versions is a coincidence.
+
+If you release the BOM, bump the hotfix version number.
+
+== Release procedure
+
+To mimic a release without pushing any changes:
+
+----
+$ mvn clean install
+$ mvn release:prepare -DdryRun
+$ mvn release:clean
+----
+
+To actually release:
+
+----
+$ mvn release:prepare
+$ mvn release:perform
+----
+
+Then go to https://repository.jboss.org/nexus/[Nexus] and log in.
+Find your staging repository, close it and release it.
+
+=== Version mapping
+
+This section records which project/product versions use which bom version.
+
+* bom 6.1
+
+** Not applicable yet
+
+* bom 6.0
+
+** Projects
+
+*** KIE (Drools, jBPM, OptaPlanner) 6.0
+
+** Products
+
+*** BRMS 6.0
+
+=== Testing
+Directory `ip-bom-deps-available-test` contains simple Bash script that can be used to verify that all the dependencies
+declared in `<dependencyManagement>` are actually available (downloadable). The script uses ip-bom to get list of all
+dependencies under `<dependencyManagement>` and then uses that list to create new POM that depends on all of them.
+Simple `dependency:resolve` Maven build is executed to make sure all dependencies are available. If there is one or more
+dependencies not available the build will fail. Following remote repositories are used: Maven Central, JBoss.org Nexus
+and Red Hat Public Product Repo (for *-redhat-X exceptions).

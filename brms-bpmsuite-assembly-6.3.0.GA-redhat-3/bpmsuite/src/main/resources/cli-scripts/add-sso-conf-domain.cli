@@ -1,0 +1,4 @@
+/profile=default/subsystem=web/virtual-server=default-host/sso=configuration:add()
+/profile=full/subsystem=web/virtual-server=default-host/sso=configuration:add()
+/profile=ha/subsystem=web/virtual-server=default-host/sso=configuration:add()
+/profile=full-ha/subsystem=web/virtual-server=default-host/sso=configuration:add()

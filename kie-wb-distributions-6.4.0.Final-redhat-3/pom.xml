@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+~ Copyright 2012 Red Hat, Inc. and/or its affiliates.
+~
+~ Licensed under the Apache License, Version 2.0 (the "License");
+~ you may not use this file except in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~       http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing, software
+~ distributed under the License is distributed on an "AS IS" BASIS,
+~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~ See the License for the specific language governing permissions and
+~ limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-parent-with-dependencies</artifactId>
+    <version>6.4.0.Final-redhat-3</version>
+  </parent>
+
+  <artifactId>kie-wb-distributions</artifactId>
+
+  <packaging>pom</packaging>
+
+  <version>6.4.0.Final-redhat-3</version>
+  <name>KIE Workbench - Distributions</name>
+  <description>KIE Workbench - Distributions</description>
+
+  <properties>
+    <jdk.min.version>1.7.0</jdk.min.version>
+  </properties>
+
+  <modules>
+    <module>kie-config-cli</module>
+    <module>kie-wb-example-repositories</module>
+    <module>kie-wb</module>
+    <module>kie-drools-wb</module>
+    <module>kie-tomcat-integration</module>
+    <module>kie-wb-smoke-tests</module>
+  </modules>
+
+  <dependencyManagement></dependencyManagement>
+
+  <build>
+    <plugins>
+
+      <!--Fix translations from Zanata -->
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*_de.properties</include>
+            <include>**/*_es.properties</include>
+            <include>**/*_fr.properties</include>
+            <include>**/*_ja.properties</include>
+            <include>**/*_pt_BR.properties</include>
+          </includes>
+          <excludes>
+            <exclude>kie-wb/kie-wb-webapp/src/main/resources/org/kie/workbench/client/resources/i18n/LoginConstants*.properties</exclude>
+            <exclude>kie-drools-wb-webapp/src/main/resources/org/kie/workbench/drools/client/resources/i18n/LoginConstants*.properties</exclude>
+            <exclude>**/ErraiApp.properties</exclude>
+          </excludes>
+          <replacements>
+            <replacement>
+              <token>''</token>
+              <value>'</value>
+            </replacement>
+            <replacement>
+              <token>'</token>
+              <value>''</value>
+            </replacement>
+          </replacements>
+        </configuration>
+      </plugin>
+
+      <!-- Zanata - translations -->
+      <plugin>
+        <groupId>org.zanata</groupId>
+        <artifactId>zanata-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>native2ascii-maven-plugin</artifactId>
+        <version>1.0-beta-1</version>
+        <configuration>
+          <includes>
+            <include>kie-wb/kie-wb-webapp/src/main/resources/org/kie/workbench/client/resources/i18n/LoginConstants*.properties</include>
+            <include>kie-drools-wb-webapp/src/main/resources/org/kie/workbench/drools/client/resources/i18n/LoginConstants*.properties</include>
+          </includes>
+          <workDir>.</workDir>
+          <tempDir>.</tempDir>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>project-sources-maven-plugin</artifactId>
+        <version>0.3</version>
+        <executions>
+          <execution>
+            <id>project-sources-archive</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>archive</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+
+    <profile>
+      <id>productizedProfile</id>
+      <activation>
+        <property>
+          <name>productized</name>
+        </property>
+      </activation>
+      <modules>
+        <module>kie-wb-distribution-home</module>
+      </modules>
+    </profile>
+
+  </profiles>
+
+</project>
+<!--
+Modified by POM Manipulation Extension for Maven 1.17 ( SHA: 89482a03 ) 
+-->
+

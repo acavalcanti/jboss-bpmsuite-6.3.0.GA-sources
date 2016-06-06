@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+    <artifactId>patch-distributions</artifactId>
+    <version>6.3.0.GA-redhat-3</version>
+  </parent>
+
+  <artifactId>jboss-bpmsuite</artifactId>
+
+  <name>JBoss BPM Suite Patch Distribution</name>
+  <description>This module creates final patch distribution. These include everything needed and can be directly used
+    to patch existing installations.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+      <artifactId>client-patcher</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+
+    <!-- BPM Suite specific patch diffs -->
+    <dependency>
+      <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+      <artifactId>distribution-diffs</artifactId>
+      <classifier>bpmsuite-eap6.x</classifier>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+      <artifactId>distribution-diffs</artifactId>
+      <classifier>bpmsuite-generic</classifier>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+      <artifactId>distribution-diffs</artifactId>
+      <classifier>bpmsuite-was8</classifier>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+      <artifactId>distribution-diffs</artifactId>
+      <classifier>bpmsuite-wls12c</classifier>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+      <artifactId>distribution-diffs</artifactId>
+      <classifier>bpmsuite-engine</classifier>
+      <type>zip</type>
+    </dependency>
+
+    <!-- Patch diffs shared between BRMS and BPM Suite -->
+    <dependency>
+      <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+      <artifactId>distribution-diffs</artifactId>
+      <classifier>brms-bpmsuite-planner-engine</classifier>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+      <artifactId>distribution-diffs</artifactId>
+      <classifier>brms-bpmsuite-supplementary-tools</classifier>
+      <type>zip</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-distribution</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <finalName>${project.artifactId}-${version.brms-bpmsuite.latest.patch.user.facing}</finalName>
+              <descriptors>
+                <descriptor>src/main/assembly/assembly-bpmsuite-patch-distribution.xml</descriptor>
+              </descriptors>
+              <filters>
+                <filter>src/main/assembly/bpmsuite.properties</filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

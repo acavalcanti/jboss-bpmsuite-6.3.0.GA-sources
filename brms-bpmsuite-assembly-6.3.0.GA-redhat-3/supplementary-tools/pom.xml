@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+~ JBoss, Home of Professional Open Source.
+~ Copyright 2013, Red Hat, Inc., and individual contributors
+~ as indicated by the @author tags. See the copyright.txt file in the
+~ distribution for a full listing of individual contributors.
+~
+~ This is free software; you can redistribute it and/or modify it
+~ under the terms of the GNU Lesser General Public License as
+~ published by the Free Software Foundation; either version 2.1 of
+~ the License, or (at your option) any later version.
+~
+~ This software is distributed in the hope that it will be useful,
+~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+~ Lesser General Public License for more details.
+~
+~ You should have received a copy of the GNU Lesser General Public
+~ License along with this software; if not, write to the Free
+~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+<modelVersion>4.0.0</modelVersion>
+
+<parent>
+  <groupId>org.jboss.ip</groupId>
+  <artifactId>brms-bpmsuite-assembly</artifactId>
+  <version>6.3.0.GA-redhat-3</version>
+  <relativePath>../</relativePath>
+</parent>
+<name>Integration Platform BRMS BPMSuite Supplementary Distributions</name>
+<artifactId>jboss-brms-bpmsuite</artifactId>
+<packaging>pom</packaging>
+
+<properties>
+  <optaplanner.staging.dir>${project.build.directory}/optaplanner-distribution-${version.org.kie}</optaplanner.staging.dir>
+  <supplementary-tools.staging.dir>${project.build.directory}/supplementary-tools</supplementary-tools.staging.dir>
+  <dashbuilder-generic.staging.dir>${basedir}/../bpmsuite/target/dashbuilder-generic.war</dashbuilder-generic.staging.dir>
+  <version.zookeeper>3.3.4</version.zookeeper>
+  <version.patched-zookeeper>3.3.4-redhat-1</version.patched-zookeeper>
+  <version.commons-collections>3.2.1.redhat-7</version.commons-collections>
+  <version.helix>0.6.5</version.helix>
+  <version.patched-helix>0.6.5-redhat-1</version.patched-helix>
+</properties>
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-dependency-plugin</artifactId>
+
+      <executions>
+        <execution>
+          <id>get-drools-wb</id>
+          <phase>generate-sources</phase>
+          <goals>
+            <goal>unpack</goal>
+          </goals>
+
+          <configuration>
+            <artifactItems>
+              <!-- optaplanner source-->
+              <artifactItem>
+                <groupId>org.optaplanner</groupId>
+                <artifactId>optaplanner-distribution</artifactId>
+                <version>${version.org.kie}</version>
+                <type>zip</type>
+                <outputDirectory>${project.build.directory}</outputDirectory>
+              </artifactItem>
+
+              <!-- Migration tool -->
+              <artifactItem>
+                <groupId>org.drools</groupId>
+                <artifactId>drools-wb-jcr2vfs-distribution</artifactId>
+                <version>${version.org.kie}</version>
+                <type>zip</type>
+                <outputDirectory>${project.build.directory}</outputDirectory>
+              </artifactItem>
+
+              <!-- HA cluster tool -->
+              <artifactItem>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper-dist</artifactId>
+                <version>${version.zookeeper}</version>
+                <type>zip</type>
+                <outputDirectory>${supplementary-tools.staging.dir}</outputDirectory>
+                <!-- For security fixes -->
+                <excludes>**/jline-0.9.94.jar</excludes>
+              </artifactItem>
+
+              <artifactItem>
+                <groupId>org.apache.helix</groupId>
+                <artifactId>helix-core</artifactId>
+                <version>${version.helix}</version>
+                <classifier>pkg</classifier>
+                <type>tar</type>
+                <outputDirectory>${supplementary-tools.staging.dir}</outputDirectory>
+                <excludes>**/jline/**</excludes>
+              </artifactItem>
+
+              <!-- KIE CLI -->
+              <artifactItem>
+                <groupId>org.kie</groupId>
+                <artifactId>kie-config-cli</artifactId>
+                <version>${version.org.kie}</version>
+                <type>zip</type>
+                <classifier>dist</classifier>
+                <outputDirectory>${supplementary-tools.staging.dir}/kie-config-cli-${version.org.kie}-dist</outputDirectory>
+              </artifactItem>
+
+              <!-- Bug 1009443 Fix DDL  -->
+              <artifactItem>
+                <groupId>org.jbpm</groupId>
+                <artifactId>jbpm-distribution</artifactId>
+                <version>${version.org.kie}</version>
+                <type>zip</type>
+                <classifier>installer</classifier>
+                <outputDirectory>${project.build.directory}</outputDirectory>
+              </artifactItem>
+
+              <!-- Add quickstart  -->
+              <artifactItem>
+                <groupId>org.jboss.quickstarts.brms</groupId>
+                <artifactId>jboss-brms-bpmsuite-quickstarts-dist</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <outputDirectory>${project.build.directory}</outputDirectory>
+              </artifactItem>
+
+              <artifactItem>
+                <groupId>org.jboss.quickstarts.brms</groupId>
+                <artifactId>jboss-brms-bpmsuite-repository-dist</artifactId>
+                <version>1.0.0</version>
+                <type>zip</type>
+                <outputDirectory>${project.build.directory}</outputDirectory>
+              </artifactItem>
+
+              <artifactItem>
+                <groupId>org.jboss</groupId>
+                <artifactId>jboss-bpm-example-dist</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <outputDirectory>${project.build.directory}/jboss-bpmsuite-example</outputDirectory>
+              </artifactItem>
+
+              <artifactItem>
+                <groupId>org.jboss</groupId>
+                <artifactId>jboss-bpm-example-dist</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <classifier>source</classifier>
+                <outputDirectory>${project.build.directory}/jboss-bpmsuite-example-source</outputDirectory>
+              </artifactItem>
+              
+            </artifactItems>
+            <overWriteSnapshots>true</overWriteSnapshots>
+          </configuration>
+        </execution>
+
+        <execution>
+          <id>get-commons-collections</id>
+          <phase>generate-sources</phase>
+          <goals>
+            <goal>copy</goal>
+          </goals>
+
+          <configuration>
+            <artifactItems>
+              <artifactItem>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${version.commons-collections}</version>
+                <outputDirectory>${project.build.directory}/</outputDirectory>
+              </artifactItem>
+            </artifactItems>
+          </configuration>
+        </execution>
+
+        <execution>
+          <id>get-helix-jline</id>
+          <phase>generate-sources</phase>
+          <goals>
+            <goal>copy</goal>
+          </goals>
+
+          <configuration>
+            <artifactItems>
+              <artifactItem>
+                <groupId>jline</groupId>
+                <artifactId>jline</artifactId>
+                <version>0.9.94-redhat-0</version>
+                <outputDirectory>${project.build.directory}/</outputDirectory>
+              </artifactItem>
+            </artifactItems>
+          </configuration>
+        </execution>
+
+        <execution>
+          <id>get-drools-karaf-features</id>
+          <phase>generate-sources</phase>
+          <goals>
+            <goal>copy</goal>
+          </goals>
+
+          <configuration>
+            <artifactItems>
+              <artifactItem>
+                <groupId>org.drools</groupId>
+                <artifactId>drools-karaf-features</artifactId>
+                <version>${version.org.kie}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+                <outputDirectory>${project.build.directory}/drools-karaf-features</outputDirectory>
+              </artifactItem>
+            </artifactItems>
+          </configuration>
+        </execution>
+
+      </executions>
+    </plugin>
+
+    <plugin>
+      <artifactId>maven-antrun-plugin</artifactId>
+      <version>1.7</version>
+      <executions>
+        <execution>
+          <id>build</id>
+          <phase>prepare-package</phase>
+          <goals>
+            <goal>run</goal>
+          </goals>
+          <configuration>
+            <target>
+              <echo file="${supplementary-tools.staging.dir}/helix-core-${version.helix}/version.txt" append="false">Apache helix-core - Version ${version.patched-helix}</echo>
+              <echo file="${supplementary-tools.staging.dir}/zookeeper-${version.zookeeper}/version.txt" append="false">Apache zookeeper - Version ${version.patched-zookeeper}</echo>
+            </target>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-assembly-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>migration-assembly</id>
+          <phase>package</phase>
+          <goals>
+            <goal>single</goal>
+          </goals>
+          <configuration>
+            <finalName>jboss-brms-bpmsuite-${project.version}</finalName>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <appendAssemblyId>true</appendAssemblyId>
+            <attach>true</attach>
+            <descriptors>
+              <descriptor>${basedir}/src/main/assembly/migration.zip.xml</descriptor>
+              <descriptor>${basedir}/src/main/assembly/planner-engine.zip.xml</descriptor>
+              <descriptor>${basedir}/src/main/assembly/quickstarts.zip.xml</descriptor>
+              <descriptor>${basedir}/src/main/assembly/supplementary-tools.zip.xml</descriptor>
+              <descriptor>${basedir}/src/main/assembly/fuse-features.xml</descriptor>
+            </descriptors>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+</project>

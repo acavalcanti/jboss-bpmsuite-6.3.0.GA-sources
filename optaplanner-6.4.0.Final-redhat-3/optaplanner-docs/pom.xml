@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.optaplanner</groupId>
+    <artifactId>optaplanner</artifactId>
+    <version>6.4.0.Final-redhat-3</version>
+  </parent>
+
+  <artifactId>optaplanner-docs</artifactId>
+  <packaging>jdocbook</packaging>
+
+  <name>OptaPlanner documentation</name>
+  <description>OptaPlanner solves planning problems.
+    This lightweight, embeddable planning engine implements powerful and scalable algorithms
+    to optimize business resource scheduling and planning.
+
+    This module builds the documentation.</description>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.jboss.maven.plugins</groupId>
+          <artifactId>maven-jdocbook-plugin</artifactId>
+          <configuration>
+            <options>
+              <transformerParameters>
+                <html.googleAnalyticsId>UA-39485370-1</html.googleAnalyticsId>
+                <html.googleTagManagerId>GTM-NJWS5L</html.googleTagManagerId>
+                <html.googleTagManagerChannel>OptaPlanner</html.googleTagManagerChannel>
+              </transformerParameters>
+            </options>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>productizationDocsProfile</id>
+      <activation>
+        <property>
+          <name>productizationDocs</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.jboss.maven.plugins</groupId>
+              <artifactId>maven-jdocbook-plugin</artifactId>
+
+              <configuration>
+                <!-- This file does not exist in the community repository, but it does exist in the product-docs repo -->
+                <sourceDocumentName>productMaster.xml</sourceDocumentName>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jboss</groupId>
+    <artifactId>jboss-parent</artifactId>
+    <version>16</version>
+  </parent>
+
+  <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+  <artifactId>patching-tools-parent</artifactId>
+  <version>6.3.0.GA-redhat-3</version>
+  <packaging>pom</packaging>
+
+  <name>JBoss BRMS and BPM Suite Patching Tools</name>
+
+  <properties>
+    <!-- Overwrite config coming from jboss-parent. We need to support JDK6. -->
+    <maven.compiler.target>1.6</maven.compiler.target>
+    <jboss.dist.version>7.5.7.Final-redhat-3</jboss.dist.version>
+    <version.org.jboss.errai.cdi10-compatible>3.0.6.Final-redhat-1</version.org.jboss.errai.cdi10-compatible>
+    <version.org.uberfire.ext>0.8.0.Final-redhat-3</version.org.uberfire.ext>
+    <version.org.mvel>2.2.8.Final-redhat-1</version.org.mvel>
+    <version.fuse.eap>6.2.1.redhat-084</version.fuse.eap>
+    <version.org.kie.workbench.app>6.3.0.GA</version.org.kie.workbench.app>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <version.org.jboss.as>7.5.7.Final-redhat-3</version.org.jboss.as>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <!-- Overwrite plugin versions coming from parent-->
+    <version.surefire.plugin>2.18.1</version.surefire.plugin>
+    <version.org.jboss.bom.brms>6.3.0.GA-redhat-3</version.org.jboss.bom.brms>
+    <version.org.kie>6.4.0.Final-redhat-3</version.org.kie>
+
+    <version.brms-bpmsuite.previous.release>6.1.5.GA-redhat-2</version.brms-bpmsuite.previous.release>
+
+    <version.org.jboss.integration-platform>6.0.6.Final-redhat-1</version.org.jboss.integration-platform>
+    <version.brms-bpmsuite.latest.release>6.3.0.GA-redhat-3</version.brms-bpmsuite.latest.release>
+    <!-- User facing version of the patch release. For example 6.1.1 or 6.1.2. This is used in the zip names as we
+         want nicer names like "jboss-brms-6.1.1-patch" instead of "jboss-brms-6.1.1.GA-redhat-2-patch.zip". -->
+    <version.brms-bpmsuite.latest.patch.user.facing>6.1.5-to-6.3.0.GA</version.brms-bpmsuite.latest.patch.user.facing>
+    <!-- For first patches in the stream, the property should be set to 'NONE' to clearly indicate there is no previous version -->
+    <version.brms-bpmsuite.previous.patch>NONE</version.brms-bpmsuite.previous.patch>
+    <version.org.uberfire>0.8.0.Final-redhat-3</version.org.uberfire>
+    <version.org.jboss.errai>3.2.3.Final-redhat-1</version.org.jboss.errai>
+    <version.org.dashbuilder>0.4.0.Final-redhat-3</version.org.dashbuilder>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Internal modules -->
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>client-patcher</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>patch-distributions</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+      </dependency>
+
+      <!-- BRMS specific patch diffs -->
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>brms-eap6.x</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>brms-generic</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>brms-was8</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>brms-wls12c</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>brms-engine</classifier>
+        <type>zip</type>
+      </dependency>
+
+      <!-- Patch diffs shared between BRMS and BPM Suite -->
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>brms-bpmsuite-planner-engine</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>brms-bpmsuite-supplementary-tools</classifier>
+        <type>zip</type>
+      </dependency>
+
+      <!-- BPM Suite specific patch diffs -->
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>bpmsuite-eap6.x</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>bpmsuite-generic</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>bpmsuite-was8</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>bpmsuite-wls12c</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.brms-bpmsuite.patching-61-to-63</groupId>
+        <artifactId>distribution-diffs</artifactId>
+        <version>6.3.0.GA-redhat-3</version>
+        <classifier>bpmsuite-engine</classifier>
+        <type>zip</type>
+      </dependency>
+
+      <!-- External dependencies -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.7</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.1.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>18.0</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.zeroturnaround</groupId>
+        <artifactId>zt-zip</artifactId>
+        <version>1.8</version>
+      </dependency>
+
+      <!-- Test dependencies -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.11</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.3.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.ant</groupId>
+        <artifactId>ant</artifactId>
+        <version>1.9.4</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.googlecode.maven-download-plugin</groupId>
+          <artifactId>download-maven-plugin</artifactId>
+          <version>1.2.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>project-sources-maven-plugin</artifactId>
+        <version>0.3</version>
+        <executions>
+          <execution>
+            <id>project-sources-archive</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>archive</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>standard-build</id>
+      <activation>
+        <property>
+          <name>!integrationTests</name>
+        </property>
+      </activation>
+      <modules>
+        <module>client-patcher</module>
+        <module>distribution-diffs</module>
+        <module>patch-distributions</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>integration-tests</id>
+      <activation>
+        <property>
+          <name>integrationTests</name>
+        </property>
+      </activation>
+      <modules>
+        <module>integration-tests</module>
+      </modules>
+    </profile>
+  </profiles>
+
+</project>
+<!--
+Modified by POM Manipulation Extension for Maven 1.17 ( SHA: 89482a03 ) 
+-->
+

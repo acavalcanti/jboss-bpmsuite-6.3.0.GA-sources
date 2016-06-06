@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0"
+         xsi:schemaLocation="http://docbook.org/ns/docbook http://www.docbook.org/xml/5.0/xsd/docbook.xsd http://www.w3.org/1999/xlink http://www.docbook.org/xml/5.0/xsd/xlink.xsd"
+         xml:base="../" xml:id="integration" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title>Integration</title>
+
+  <section xml:id="integrationOverview">
+    <title>Overview</title>
+
+    <para>Planner's input and output data (the planning problem and the best solution) are plain old JavaBeans (POJO's),
+    so integration with other Java technologies is straightforward. For example:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>To read a planning problem from the database (and store the best solution in it), annotate the domain
+        POJO's with JPA annotations.</para>
+      </listitem>
+
+      <listitem>
+        <para>To read a planning problem from an XML file (and store the best solution in it), annotate the domain
+        POJO's with XStream or JAXB annotations.</para>
+      </listitem>
+
+      <listitem>
+        <para>To expose the Solver as a REST Service that reads the planning problem and responds with the best
+        solution, annotate the domain POJO's with XStream or JAXB annotations and hook the <literal>Solver</literal> in
+        Camel or RESTEasy.</para>
+      </listitem>
+    </itemizedlist>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="images/Chapter-Integration/integrationOverview.png"/>
+      </imageobject>
+    </mediaobject>
+  </section>
+
+  <section xml:id="integrationWithPersistentStorage">
+    <title>Persistent Storage</title>
+
+    <section xml:id="integrationWithJpaAndHibernate">
+      <title>Database: JPA and Hibernate</title>
+
+      <para>Enrich the domain POJO's (solution, entities and problem facts) with JPA annotations to store them in a
+      database.</para>
+
+      <note>
+        <para>Do not confuse JPA's <literal>@Entity</literal> annotation with Planner's
+        <literal>@PlanningEntity</literal> annotation. They can appear both on the same class:</para>
+
+        <programlisting language="java">@PlanningEntity // OptaPlanner annotation
+@Entity // JPA annotation
+public class Talk {...}</programlisting>
+      </note>
+
+      <para>Add a dependency to the <literal>optaplanner-persistence-jpa</literal> jar to take advantage of these extra
+      integration features:</para>
+
+      <section xml:id="jpaAndHibernatePersistingAScore">
+        <title>JPA and Hibernate: Persisting a <literal>Score</literal></title>
+
+        <para>When a <literal>Score</literal> is persisted into a relational database, JPA and Hibernate will default to
+        Java serializing it to a <literal>BLOB</literal> column. This has several disadvantages:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>The Java serialization format of <literal>Score</literal> classes is currently not backwards
+            compatible. Upgrading to a newer Planner version can break reading an existing database.</para>
+          </listitem>
+
+          <listitem>
+            <para>The score is not easily readable for a query executed in the database console. This is annoying during
+            development.</para>
+          </listitem>
+
+          <listitem>
+            <para>The score cannot be used in a SQL or JPA-QL query to filter the results: for example to query all
+            infeasible schedules.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>To avoid these issues, configure it to use 2 <literal>INTEGER</literal> columns instead by using the
+        appropriate <literal>*ScoreHibernateType</literal> for your <literal>Score</literal> type, for example for a
+        <literal>HardSoftScore</literal>:</para>
+
+        <programlisting language="java">@PlanningSolution
+@Entity
+@TypeDef(defaultForType = HardSoftScore.class, typeClass = HardSoftScoreHibernateType.class)
+public class CloudBalance implements Solution&lt;HardSoftScore&gt; {
+
+    @Columns(columns = {@Column(name = "hardScore"), @Column(name = "softScore")})
+    protected HardSoftScore score;
+
+    ...
+}</programlisting>
+
+        <note>
+          <para>Configure the same number of <literal>@Column</literal> annotations as the number of score levels in the
+          score, otherwise Hibernate will fail fast because a property mapping has the wrong number of columns.</para>
+        </note>
+
+        <para>In this case, the DDL will look like this:</para>
+
+        <programlisting language="sql">CREATE TABLE CloudBalance(
+    ...
+    hardScore INTEGER,
+    softScore INTEGER
+);</programlisting>
+
+        <para>When using a <literal>BigDecimal</literal> based <literal>Score</literal>, specify the precision and scale
+        of the columns to avoid silent rounding:</para>
+
+        <programlisting language="java">@PlanningSolution
+@Entity
+@TypeDef(defaultForType = HardSoftBigDecimalScore.class, typeClass = HardSoftBigDecimalScoreHibernateType.class)
+public class CloudBalance implements Solution&lt;HardSoftBigDecimalScore&gt; {
+
+    @Columns(columns = {
+            @Column(name = "hardScore", precision = 10, scale = 5),
+            @Column(name = "softScore", precision = 10, scale = 5)})
+    protected HardSoftBigDecimalScore score;
+
+    ...
+}</programlisting>
+
+        <para>When using any type of bendable <literal>Score</literal>, specify the hard and soft level sizes as
+        parameters:</para>
+
+        <programlisting language="java">@PlanningSolution
+@Entity
+@TypeDef(defaultForType = BendableScore.class, typeClass = BendableScoreHibernateType.class, parameters = {
+        @Parameter(name = "hardLevelsSize", value = "3"),
+        @Parameter(name = "softLevelsSize", value = "2")})
+public class Schedule implements Solution&lt;BendableScore&gt; {
+
+    @Columns(columns = {
+            @Column(name = "hard0Score"),
+            @Column(name = "hard1Score"),
+            @Column(name = "hard2Score"),
+            @Column(name = "soft0Score"),
+            @Column(name = "soft1Score")})
+    protected BendableScore score;
+
+    ...
+}</programlisting>
+
+        <para>All this support is Hibernate specific because currently JPA 2.1's converters do not support converting to
+        multiple columns.</para>
+      </section>
+
+      <section xml:id="jpaAndHibernatePlanningCloning">
+        <title>JPA and Hibernate: Planning Cloning</title>
+
+        <para>In JPA and Hibernate, there is usually a <literal>@ManyToOne</literal> relationship from most problem fact
+        classes to the planning solution class. Therefore, the problem fact classes reference the planning solution
+        class, which implies that when the solution is <link linkend="cloningASolution">planning cloned</link>, they
+        need to be cloned too. Use an <literal>@DeepPlanningClone</literal> on each such problem fact class to enforce
+        that:</para>
+
+        <programlisting language="java">@PlanningSolution // OptaPlanner annotation
+@Entity // JPA annotation
+public class Conference {
+
+    @OneToMany(mappedBy="conference")
+    private List&lt;Room&gt; roomList;
+
+    ...
+}</programlisting>
+
+        <programlisting language="java">@DeepPlanningClone // OptaPlanner annotation: Force the default planning cloner to planning clone this class too
+@Entity // JPA annotation
+public class Room {
+
+    @ManyToOne
+    private Conference conference; // Because of this reference, this problem fact needs to be planning cloned too
+
+}</programlisting>
+
+        <para>Neglecting to do this can lead to persisting duplicate solutions, JPA exceptions or other side
+        effects.</para>
+      </section>
+    </section>
+
+    <section xml:id="integrationWithXStream">
+      <title>XML or JSON: XStream</title>
+
+      <para>Enrich the domain POJO's (solution, entities and problem facts) with XStream annotations to serialize them
+      to/from XML or JSON.</para>
+
+      <para>Add a dependency to the <literal>optaplanner-persistence-xstream</literal> jar to take advantage of these
+      extra integration features:</para>
+
+      <section xml:id="xStreamMarshallingAScore">
+        <title>XStream: Marshalling a <literal>Score</literal></title>
+
+        <para>When a <literal>Score</literal> is marshalled to XML or JSON by the default XStream configuration, it's
+        verbose and ugly. To fix that, configure the <literal>XStreamScoreConverter</literal> and provide the
+        <literal>ScoreDefinition</literal> as a parameter:</para>
+
+        <programlisting language="java">@PlanningSolution
+@XStreamAlias("CloudBalance")
+public class CloudBalance implements Solution&lt;HardSoftScore&gt; {
+
+    @XStreamConverter(value = XStreamScoreConverter.class, types = {HardSoftScoreDefinition.class})
+    private HardSoftScore score;
+
+    ...
+}</programlisting>
+
+        <para>For example, this will generate pretty XML:</para>
+
+        <programlisting language="xml">&lt;CloudBalance&gt;
+   ...
+   &lt;score&gt;0hard/-200soft&lt;/score&gt;
+&lt;/CloudBalance&gt;</programlisting>
+
+        <para>To use this for any type of bendable score, also provide 2 <literal>int</literal> parameters to define
+        <literal>hardLevelsSize</literal> and <literal>softLevelsSize</literal>:</para>
+
+        <programlisting language="java">@PlanningSolution
+@XStreamAlias("Schedule")
+public class Schedule implements Solution&lt;BendableScore&gt; {
+
+    @XStreamConverter(value = XStreamScoreConverter.class, types = {BendableScoreDefinition.class}, ints = {2, 3})
+    private BendableScore score;
+
+    ...
+}</programlisting>
+
+        <para>For example, this will generate:</para>
+
+        <programlisting language="xml">&lt;Schedule&gt;
+   ...
+   &lt;score&gt;0/0/-100/-20/-3&lt;/score&gt;
+&lt;/Schedule&gt;</programlisting>
+      </section>
+    </section>
+
+    <section xml:id="integrationWithJaxb">
+      <title>XML or JSON: JAXB</title>
+
+      <para>Enrich the domain POJO's (solution, entities and problem facts) with JAXB annotations to serialize them
+      to/from XML or JSON.</para>
+    </section>
+  </section>
+
+  <section xml:id="integrationWithSoaAndEsb">
+    <title>SOA and ESB</title>
+
+    <section xml:id="integrationWithCamel">
+      <title>Camel and Karaf</title>
+
+      <para><link xlink:href="http://camel.apache.org/">Camel</link> is an enterprise integration framework which
+      includes support for Planner (starting from Camel 2.13). It can expose a use case as a REST service, a SOAP
+      service, a JMS service, ...</para>
+
+      <para><link xlink:href="http://camel.apache.org/optaplanner.html">Read the documentation for the camel-optaplanner
+      component.</link> That component works in Karaf too.</para>
+    </section>
+  </section>
+
+  <section xml:id="integrationWithOtherEnvironments">
+    <title>Other Environments</title>
+
+    <section xml:id="integrationWithJBossModules">
+      <title>JBoss Modules, WildFly and JBoss EAP</title>
+
+      <para>To deploy an Planner web application on WildFly, simply include the optaplanner dependency jars in the
+      <literal>war</literal> file's <literal>WEB-INF/lib</literal> directory (just like any other dependency) as shown
+      in the <literal>optaplanner-webexamples-*.war</literal>. However, in this approach the war file can easily grow to
+      several MB in size, which is fine for a one-time deployment, but too heavyweight for frequent redeployments
+      (especially over a slow network connection).</para>
+
+      <para>The remedy is to use deliver the optaplanner jars in a JBoss module to WildFly and create a skinny war.
+      Let's create an module called <emphasis>org.optaplanner</emphasis>:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Navigate to the directory <literal role="bold">${WILDFLY_HOME}/modules/system/layers/base/</literal>.
+          This directory contains the JBoss modules of WildFly. Create directory structure
+          <literal>org/optaplanner/main</literal> for our new module.</para>
+
+          <orderedlist>
+            <listitem>
+              <para>Copy <literal>optaplanner-core-${version}.jar</literal> and all its direct and transitive dependency
+              jars into that new directory. Use "mvn dependency:tree" on each optaplanner artifact to discover all
+              dependencies.</para>
+            </listitem>
+
+            <listitem>
+              <para>Create the file <literal>module.xml</literal> in that new directory. Give it this content:</para>
+
+              <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;module xmlns="urn:jboss:module:1.3" name="org.optaplanner"&gt;
+  &lt;resources&gt;
+    ...
+    &lt;resource-root path="kie-api-${version}.jar"/&gt;
+    ...
+    &lt;resource-root path="optaplanner-core-${version}.jar"/&gt;
+    ...
+    &lt;resource-root path="."/&gt; 
+  &lt;/resources&gt;
+  &lt;dependencies&gt;
+    &lt;module name="javaee.api"/&gt;
+  &lt;/dependencies&gt;
+&lt;/module&gt;</programlisting>
+            </listitem>
+          </orderedlist>
+        </listitem>
+
+        <listitem>
+          <para>Navigate to the deployed <literal>war</literal> file.</para>
+
+          <orderedlist>
+            <listitem>
+              <para>Remove <literal>optaplanner-core-${version}.jar</literal> and all its direct and transitive
+              dependency jars from the <literal>WEB-INF/lib</literal> directory in the <literal>war</literal>
+              file.</para>
+            </listitem>
+
+            <listitem>
+              <para>Create the file <literal>jboss-deployment-structure.xml</literal> in the
+              <literal>WEB-INF/lib</literal> directory. Give it this content:</para>
+
+              <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;jboss-deployment-structure&gt;
+   &lt;deployment&gt;
+      &lt;dependencies&gt;
+         &lt;module name="org.optaplanner" export="true"/&gt;
+      &lt;/dependencies&gt;
+   &lt;/deployment&gt;
+&lt;/jboss-deployment-structure&gt;</programlisting>
+            </listitem>
+          </orderedlist>
+        </listitem>
+      </orderedlist>
+
+      <para>Because of JBoss Modules' <literal>ClassLoader</literal> magic, you'll likely need to provide the
+      <literal>ClassLoader</literal> of your classes <link linkend="solverConfigurationByXML">during the SolverFactory
+      creation</link>, so it can find the classpath resources (such as the solver config, score DRL's and domain
+      classes) in your jars.</para>
+    </section>
+
+    <section xml:id="integrationWithOSGi">
+      <title>OSGi</title>
+
+      <para>The <literal>optaplanner-core</literal> jar includes OSGi metadata in its <literal>MANIFEST.MF</literal>
+      file to function properly in an OSGi environment too. Furthermore, the maven artifact
+      <literal>drools-karaf-features</literal> (which will be renamed to <literal>kie-karaf-features</literal>) contains
+      a <literal>features.xml</literal> file that supports the OSGi-feature
+      <literal>optaplanner-engine</literal>.</para>
+
+      <para>Because of the OSGi's <literal>ClassLoader</literal> magic, you'll likely need to provide the
+      <literal>ClassLoader</literal> of your classes <link linkend="solverConfigurationByXML">during the SolverFactory
+      creation</link>, so it can find the classpath resources (such as the solver config, score DRL's and domain
+      classes) in your jars.</para>
+
+      <note>
+        <para>Planner does <emphasis>not</emphasis> require OSGi. It works perfectly fine in a normal Java environment
+        too.</para>
+      </note>
+    </section>
+
+    <section xml:id="integrationWithAndroid">
+      <title>Android</title>
+
+      <para>Android is not a complete JVM (because some JDK libraries are missing), but Planner works on Android with
+      <link linkend="easyJavaScoreCalculation">easy Java</link> or <link
+      linkend="incrementalJavaScoreCalculation">incremental Java</link> score calculation. The Drools rule engine does
+      not work on Android yet, so Drools score calculation doesn't work on Android and its dependencies need to be
+      excluded.</para>
+
+      <para><emphasis role="bold">Workaround to use Planner on Android:</emphasis></para>
+
+      <orderedlist>
+        <listitem>
+          <para>Add a dependency to the <literal>build.gradle</literal> file in your Android project to exclude
+          <literal>org.drools</literal> and <literal>xmlpull</literal> dependencies:</para>
+
+          <programlisting language="gradle">dependencies {
+    ...
+    compile('org.optaplanner:optaplanner-core:...') {
+        exclude group: 'xmlpull'
+        exclude group: 'org.drools'
+    }
+    ...
+}</programlisting>
+        </listitem>
+      </orderedlist>
+    </section>
+  </section>
+
+  <section xml:id="integrationWithHumanPlanners">
+    <title>Integration with Human Planners (Politics)</title>
+
+    <para>A good Planner implementation beats any good human planner for non-trivial datasets. Many human planners fail
+    to accept this, often because they feel threatened by an automated system.</para>
+
+    <para>But despite that, both can benefit if the human planner acts as supervisor to Planner:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><emphasis role="bold">The human planner defines and validates the score function.</emphasis></para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Some examples expose a <literal>*Parametrization</literal> object, which defines the weight for each
+            score constraint. The human planner can then tweak those weights at runtime.</para>
+          </listitem>
+
+          <listitem>
+            <para>When the business changes, the score function often needs to change too. The human planner can notify
+            the developers to add, change or remove score constraints.</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">The human planner is always in control of Planner.</emphasis></para>
+
+        <itemizedlist>
+          <listitem>
+            <para>As shown in the course scheduling example, the human planner can lock 1 or more planning variables to
+            a specific planning value and make those immovable. Because they are <link
+            linkend="immovablePlanningEntities">immovable</link>, Planner does not change them: it optimizes the
+            planning around the enforcements made by the human. If the human planner locks all planning variables,
+            he/she sidelines Planner completely.</para>
+          </listitem>
+
+          <listitem>
+            <para>In a prototype implementation, the human planner might use this occasionally. But as the
+            implementation matures, it must become obsolete. But do keep the feature alive: as a reassurance for the
+            humans. Or in case that one day the business changes dramatically before the score constraints can be
+            adjusted.</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+    </itemizedlist>
+
+    <para>Therefore, it's often a good idea to involve the human planner in your project.</para>
+  </section>
+</chapter>

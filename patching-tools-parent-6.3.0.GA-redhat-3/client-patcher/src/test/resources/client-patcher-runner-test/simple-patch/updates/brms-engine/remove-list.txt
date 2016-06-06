@@ -1,0 +1,2 @@
+drools-compiler-6.2.0.Final-redhat-3.jar
+drools-core-6.2.0.Final-redhat-3.jar

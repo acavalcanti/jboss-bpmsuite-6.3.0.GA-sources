@@ -1,0 +1,6 @@
+/subsystem=messaging/hornetq-server=default/remote-connector=netty-ssl:add(socket-binding=messaging-ssl,param={ssl-enabled=true,key-store-path="${generated.keystores.server.location}",key-store-password="${vaulted.generated.keystores.server.storepass}"})
+/subsystem=messaging/hornetq-server=default/remote-acceptor=netty-ssl:add(socket-binding=messaging-ssl,param={ssl-enabled=true,key-store-path="${generated.keystores.server.location}",key-store-password="${vaulted.generated.keystores.server.storepass}"})
+/subsystem=messaging/hornetq-server=default/connection-factory=SslRemoteConnectionFactory:add(connector={netty-ssl=placeholder},entries=[java:jboss/exported/jms/SslRemoteConnectionFactory])
+/socket-binding-group=standard-sockets/socket-binding=messaging-ssl:add(port=5446)
+/subsystem=ejb3:write-attribute(name="default-resource-adapter-name", value="hornetq-ra")
+/subsystem=ejb3:write-attribute(name=default-mdb-instance-pool, value="mdb-strict-max-pool")

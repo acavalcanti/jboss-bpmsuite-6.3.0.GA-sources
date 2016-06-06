@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-parent-with-dependencies</artifactId>
+    <version>6.4.0.Final-redhat-3</version>
+    <!-- relativePath causes out-of-date problems on hudson slaves -->
+    <!--<relativePath>../droolsjbpm-build-bootstrap/pom.xml</relativePath>-->
+  </parent>
+
+  <groupId>org.drools</groupId>
+  <artifactId>droolsjbpm-integration</artifactId>
+  <packaging>pom</packaging>
+  <version>6.4.0.Final-redhat-3</version>
+
+  <name>Drools and jBPM integration multiproject</name>
+  <description>Drools and jBPM integration with seam, spring, camel, ...</description>
+
+  <scm>
+    <connection>scm:git:git@github.com:droolsjbpm/droolsjbpm-integration.git</connection>
+    <developerConnection>scm:git:git@github.com:droolsjbpm/droolsjbpm-integration.git</developerConnection>
+    <url>https://github.com/droolsjbpm/droolsjbpm-integration</url>
+  </scm>
+
+  <modules>
+    <module>kie-identity-session-provider</module>
+    <module>kie-maven-plugin</module>
+    <!-- The example can not be in the build because of the chicken-egg problem with depending on the plugin,
+         that is about to be build in the same Maven reactor build -->
+    <!--<module>kie-maven-plugin-example</module>-->
+    <module>drools-benchmark</module>
+    <module>drools-simulator</module>
+    <module>drools-rhq-plugin</module>
+    <module>droolsjbpm-integration-examples</module>
+    <module>jbpm-simulation</module>
+    <module>kie-remote</module>
+    <module>kie-spring</module>
+    <module>kie-aries-blueprint</module>
+    <module>kie-infinispan</module>
+    <module>drools-jboss-integration</module>
+    <module>kie-server-parent</module>
+    <module>jbpm-process-svg</module>
+    <module>drools-osgi</module>
+    <module>kie-performance-kit</module>
+    <module>drools-android</module>
+    <!-- The Android examples require Android SDK to be installed, so they are excluded from the default build -->
+    <!-- <module>drools-examples-android</module> -->
+  </modules>
+
+  <dependencyManagement></dependencyManagement>
+
+  <profiles>
+    <profile>
+      <id>fullProfile</id>
+      <activation>
+        <property>
+          <name>full</name>
+        </property>
+      </activation>
+      <modules>
+        <module>droolsjbpm-integration-distribution</module>
+        <module>droolsjbpm-bpms-distribution</module>
+        <module>droolsjbpm-brms-distribution</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>android</id>
+      <!-- Do not active the profile automatically even if the ANDROID_HOME is set.
+           On most CI machines, the ANDROID_HOME is set, but the SDK is outdated and
+           the build then fails.
+
+           One needs to use "-Pandroid" explicitly to get the profile activated.
+      <activation>
+        <file><exists>${env.ANDROID_HOME}</exists></file>
+      </activation>
+      -->
+      <modules>
+        <module>drools-examples-android</module>
+      </modules>
+    </profile>
+  </profiles>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>project-sources-maven-plugin</artifactId>
+        <version>0.3</version>
+        <executions>
+          <execution>
+            <id>project-sources-archive</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>archive</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+<!--
+Modified by POM Manipulation Extension for Maven 1.17 ( SHA: 89482a03 ) 
+-->
+

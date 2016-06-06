@@ -1,0 +1,5 @@
+drools-compiler-6.2.0.Final-redhat-3.jar
+drools-core-6.2.0.Final-redhat-3.jar
+lib/ecj-4.3.1.redhat-1.jar
+lib/maven-core-3.2.2.jar
+SecurityPolicy/kie.policy

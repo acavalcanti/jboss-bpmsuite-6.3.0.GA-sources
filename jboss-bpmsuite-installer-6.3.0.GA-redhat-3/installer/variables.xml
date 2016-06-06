@@ -1,0 +1,139 @@
+<?xml version="1.0"?><xfragment>
+
+    <!--FieldNotEqualValidator-->
+    <variable name="FieldNotEqualValidator.check" value="adminUser,adminPassword"/>
+
+    <!--JDKCheckPanel-->
+    <variable name="JDKCheckPanel.minVersion" value="1.6.0"/>
+
+    <!--MAVEN_SETTINGS_FULLPATH-->
+    <variable name="MAVEN_SETTINGS_FULLPATH.default" value="${USER_HOME}${SYSTEM_file_separator}.m2${SYSTEM_file_separator}settings.xml"/>
+    <variable name="supp.dir.name" value="${supp.dir.name}"/>
+ 
+    <!--TargetPanel-->
+    <variable name="TargetPanel.dir.macosx" value="${USER_HOME}/BPMSuite-${version.bpms}/jboss-eap-${release.version.short}"/>
+    <variable name="TargetPanel.dir.unix" value="${USER_HOME}/BPMSuite-${version.bpms}/jboss-eap-${release.version.short}"/>
+    <variable name="TargetPanel.dir.windows" value="${USER_HOME}\BPMSuite-${version.bpms}\jboss-eap-${release.version.short}"/>
+    <variable name="TargetPanel.mustExist" value="true"/>
+    <variable name="ShowCreateDirectoryMessage" value="false"/>
+
+    <!--add-->
+    <variable name="add.new.user" value="true"/>
+
+    <!--datasource-->
+    <variable name="datasource.install" value="off"/>
+
+    <!--default-->
+    <variable name="default.eap.version" value="${release.version.short}"/>
+    <variable name="isBxMS" value="true"/>
+
+    <!--eap-->
+    <variable name="eap.needs.install" value="true"/>
+    <variable name="eap.supported.version.designation" value="${version.designation}"/>
+    <variable name="eap.supported.version.major" value="${version.major}"/>
+    <variable name="eap.supported.version.micro" value="${version.micro}"/>
+    <variable name="eap.supported.version.minor" value="${version.minor}"/>
+    <variable name="eap.recommended.version.designation" value="${recommended.version.designation}"/>
+    <variable name="eap.recommended.version.major" value="${recommended.version.major}"/>
+    <variable name="eap.recommended.version.micro" value="${recommended.version.micro}"/>
+    <variable name="eap.recommended.version.minor" value="${recommended.version.minor}"/>
+
+    <!--generateClientKeystores-->
+    <variable name="generateClientKeystores" value="true"/>
+
+    <!--generated-->
+    <variable name="generated.keystores.certificate.location" value="${INSTALL_PATH}${SYSTEM_file_separator}server.cert"/>
+    <variable name="generated.keystores.client.location" value="${INSTALL_PATH}${SYSTEM_file_separator}ssl${SYSTEM_file_separator}client${SYSTEM_file_separator}"/>
+    <variable name="generated.keystores.client.location.default" value="${INSTALL_PATH}${SYSTEM_file_separator}ssl${SYSTEM_file_separator}client${SYSTEM_file_separator}"/>
+    <variable name="generated.keystores.client.number" value="1"/>
+    <variable name="generated.keystores.client.storepass" value=""/>
+    <variable name="generated.keystores.server.alias" value="ServerStore"/>
+    <variable name="generated.keystores.server.location" value="${INSTALL_PATH}${SYSTEM_file_separator}ssl${SYSTEM_file_separator}server.keystore.jks"/>
+    <variable name="generated.keystores.server.storepass" value=""/>
+
+    <variable name="existing.keystores.client.location" value="${USER_HOME}${SYSTEM_file_separator}"/>
+
+    <!--installation-->
+    <variable name="installation.logfile" value="installation/InstallationLog.txt"/>
+
+    <!--izpack-->
+    <variable name="izpack.app.version" value="${version.bpms}"/>
+
+    <!--jdbc-->
+    <variable name="jdbc.driver.install" value="off"/>
+
+    <!--keystore-->
+    <variable name="keystore.preexisting" value="false"/>
+
+    <!-- master -->
+    <variable name="master.password.vars" value="vault.keystorepwd=install.vault,generated.keystores.server.storepass=custom.jms.keystores,generated.keystores.client.storepass=custom.jms.keystores"/>
+    <variable name="master.password.var" value="bpms.password"/>
+    <variable name="master.password" value="bpms.password"/>
+
+    <!--new-->
+    <variable name="new.layers.conf" value="bpms"/>
+    <variable name="new.product.conf" value="bpms"/>
+    <variable name="new.postinstall.vault" value="true"/>
+
+    <!--override-->
+    <variable name="override.http.port" value="8080"/>
+
+    <!--platform-->
+    <variable name="platform.readable.name" value="${platform.name}"/>
+
+    <!--postinstall-->
+    <variable name="postinstall.password" value="POSTINSTALL.TEMPPASSW0RD"/>
+    <variable name="postinstall.path" value="${INSTALL_PATH}${SYSTEM_file_separator}"/>
+    <variable name="postinstall.username" value="POSTINSTALL.TEMPUSER"/>
+
+    <!--product-->
+    <variable name="product.name" value="bpms" />
+
+    <!--pureIPv6-->
+    <variable name="pureIPv6" value="false"/>
+
+    <!--runDatabaseSchemas-->
+    <variable name="runDatabaseSchemas" value="on"/>
+
+    <!--server_mode-->
+    <variable name="server_mode" value="none"/>
+
+    <!--server_up-->
+    <variable name="server_up" value="false"/>
+
+    <!-- supplementary.tools -->
+    <variable name="supplementary.tools.pack.ids" value="BPMSuite-Tools,ZooKeeper-one,ZooKeeper-two,ZooKeeper-three"/>
+    <variable name="supplementary.tools.condition" value="install.cluster.demo"/>
+
+    <!--vault-->
+    <variable name="vault.alias" value="vault"/>
+    <variable name="vault.alias.default" value="vault"/>
+    <variable name="vault.encrdir" value="${INSTALL_PATH}${SYSTEM_file_separator}vault"/>
+    <variable name="vault.encrdir.default" value="${INSTALL_PATH}${SYSTEM_file_separator}vault${SYSTEM_file_separator}"/>
+    <variable name="vault.itercount" value="50"/>
+    <variable name="vault.itercount.default" value="50"/>
+    <variable name="vault.keystoreloc" value="${INSTALL_PATH}${SYSTEM_file_separator}vault.keystore"/>
+    <variable name="vault.keystoreloc.default" value="${INSTALL_PATH}${SYSTEM_file_separator}vault.keystore"/>
+    <variable name="vault.keystorepwd" value=""/>
+    <variable name="vault.keystorepwd.default" value="" />
+    <variable name="vault.preexisting" value="false"/>
+    <variable name="vault.salt" value="8675309K" />
+    <variable name="vault.salt.default" value="8675309K" />
+    <variable name="vault.requires.secret.key" value="true"/>
+
+    <variable name="vault.allowed.keystore.types" value="JCEKS"/>
+    <variable name="ssl.allowed.keystore.types" value="JKS,CASEEXACTJKS"/>
+    <variable name="preexisting.vault.allowed.keystore.types" value="JKS,CASEEXACTJKS,JCEKS"/>
+    <variable name="preexisting.saml.allowed.keystore.types" value="JKS,CASEEXACTJKS"/>
+
+    <variable name="standalone.conf.patch.bits-1" value=""/>
+    <variable name="host.option.bits.value" value=""/>
+    <variable name="domain.java.opts.bits-1" value=""/>
+    <variable name="appclient.conf.patch.bits-1" value=""/>
+
+    <variable name="useSamePassword" value="true"/>
+
+    <variable name="add.bits.to.configs" value="false"/>
+
+    <variable name="domain.management-https" value="${jboss.management.https.port:9443}" />
+</xfragment>

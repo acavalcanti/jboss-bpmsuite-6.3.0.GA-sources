@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.jboss.bom.brms</groupId>
+    <artifactId>jboss-brms-bpmsuite-bom-parent</artifactId>
+    <version>6.3.0.GA-redhat-3</version>
+
+    <packaging>pom</packaging>
+
+    <name>JBoss BRMS/BPM Suite BOM Parent</name>
+    <description>Dependency Management BOM Parent</description>
+
+    <url>http://www.jboss.org</url>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>https://issues.jboss.org/</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:git@github.com:jboss-developer/jboss-brms-boms.git</connection>
+        <developerConnection>scm:git:git@github.com:jboss-developer/jboss-brms-boms.git</developerConnection>
+        <url>http://github.com/jboss-developer/jboss-brms-boms</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>jboss.org</id>
+            <name>JBoss.org Community</name>
+            <organization>JBoss.org</organization>
+            <organizationUrl>http://www.jboss.org</organizationUrl>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <properties>
+        <version.org.kie>6.4.0.Final-redhat-3</version.org.kie>
+        <version.org.jboss.errai.cdi10-compatible>3.0.6.Final-redhat-1</version.org.jboss.errai.cdi10-compatible>
+        <version.org.mvel>2.2.8.Final-redhat-1</version.org.mvel>
+        <!-- Versions of Java EE6 spec artifacts, keep in sync with what the target EAP uses -->
+        <version.org.jboss.spec.jboss.javaee.6.0>3.0.2.Final-redhat-15</version.org.jboss.spec.jboss.javaee.6.0>
+        <version.fuse.eap>6.2.1.redhat-084</version.fuse.eap>
+
+        <!-- Repository Deployment URLs -->
+        <jboss.releases.repo.url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
+        <version.org.jboss.as>7.5.7.Final-redhat-3</version.org.jboss.as>
+        <version.org.uberfire>0.8.0.Final-redhat-3</version.org.uberfire>
+        <jboss.snapshots.repo.url>https://repository.jboss.org/nexus/content/repositories/snapshots/</jboss.snapshots.repo.url>
+        <version.org.kie.workbench.app>6.3.0.GA</version.org.kie.workbench.app>
+        <version.org.jboss.bom.brms>6.3.0.GA-redhat-3</version.org.jboss.bom.brms>
+        <version.org.uberfire.ext>0.8.0.Final-redhat-3</version.org.uberfire.ext>
+        <version.org.dashbuilder>0.4.0.Final-redhat-3</version.org.dashbuilder>
+        <version.org.jboss.errai>3.2.3.Final-redhat-1</version.org.jboss.errai>
+        <version.org.jboss.integration-platform>6.0.6.Final-redhat-1</version.org.jboss.integration-platform>
+        <jboss.dist.version>7.5.7.Final-redhat-3</jboss.dist.version>
+    </properties>
+
+    <modules>
+        <module>jboss-brms-bpmsuite-bom</module>
+        <module>jboss-brms-bpmsuite-platform-bom</module>
+        <module>jboss-javaee-6.0-with-brms-bpmsuite</module>
+    </modules>
+    <distributionManagement>
+        <repository>
+            <id>jboss-releases-repository</id>
+            <name>JBoss Releases Repository</name>
+            <url>${jboss.releases.repo.url}</url>
+        </repository>
+        <snapshotRepository>
+            <id>jboss-snapshots-repository</id>
+            <name>JBoss Snapshots Repository</name>
+            <url>${jboss.snapshots.repo.url}</url>
+        </snapshotRepository>
+    </distributionManagement>
+    <dependencyManagement></dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <build>
+    <plugins>
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>project-sources-maven-plugin</artifactId>
+        <version>0.3</version>
+        <executions>
+          <execution>
+            <id>project-sources-archive</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>archive</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+<!--
+Modified by POM Manipulation Extension for Maven 1.17 ( SHA: 89482a03 ) 
+-->
+

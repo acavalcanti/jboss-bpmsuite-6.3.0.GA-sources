@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-parent-with-dependencies</artifactId>
+    <version>6.4.0.Final-redhat-3</version>
+    <!-- relativePath causes out-of-date problems on hudson slaves -->
+    <!--<relativePath>../droolsjbpm-build-bootstrap/pom.xml</relativePath>-->
+  </parent>
+
+  <groupId>org.optaplanner</groupId>
+  <artifactId>optaplanner</artifactId>
+  <packaging>pom</packaging>
+  <version>6.4.0.Final-redhat-3</version>
+
+  <name>OptaPlanner multiproject parent</name>
+  <description>OptaPlanner solves planning problems.
+    This lightweight, embeddable planning engine implements powerful and scalable algorithms
+    to optimize business resource scheduling and planning.
+
+    This module is just the multiproject parent. The planning engine itself is in optaplanner-core.</description>
+  <url>http://www.optaplanner.org</url>
+  <inceptionYear>2006</inceptionYear>
+
+  <scm>
+    <connection>scm:git:git@github.com:droolsjbpm/optaplanner.git</connection>
+    <developerConnection>scm:git:git@github.com:droolsjbpm/optaplanner.git</developerConnection>
+    <url>https://github.com/droolsjbpm/optaplanner</url>
+  </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>https://issues.jboss.org/browse/PLANNER</url>
+  </issueManagement>
+
+  <modules>
+    <module>optaplanner-core</module>
+    <module>optaplanner-persistence</module>
+    <module>optaplanner-benchmark</module>
+    <module>optaplanner-examples</module>
+    <module>optaplanner-webexamples</module>
+  </modules>
+
+  <dependencyManagement></dependencyManagement>
+
+  <profiles>
+    <profile>
+      <id>fullProfile</id>
+      <activation>
+        <property>
+          <name>full</name>
+        </property>
+      </activation>
+      <modules>
+        <module>optaplanner-docs</module>
+        <module>optaplanner-distribution</module>
+      </modules>
+    </profile>
+  </profiles>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <!-- TODO: Upgrade to newest version of checkstyle once we move to Java 7+ -->
+          <!-- https://maven.apache.org/components/plugins/maven-checkstyle-plugin/examples/upgrading-checkstyle.html -->
+          <!--<dependencies>-->
+            <!--<dependency>-->
+              <!--<groupId>com.puppycrawl.tools</groupId>-->
+              <!--<artifactId>checkstyle</artifactId>-->
+              <!--<version>6.9</version>-->
+            <!--</dependency>-->
+          <!--</dependencies>-->
+          <executions>
+            <execution>
+              <id>validate</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <configuration>
+                <checkstyleRules>
+                  <module name="Checker">
+                    <property name="severity" value="warning" default="warning"></property>
+                    <!-- Checks whether files end with a new line. -->
+                    <module name="NewlineAtEndOfFile">
+                      <property name="lineSeparator" value="lf"></property>
+                    </module>
+                    <!-- Checks for whitespace. -->
+                    <module name="FileTabCharacter">
+                      <property name="severity" value="error"></property>
+                      <property name="eachLine" value="true"></property>
+                    </module>
+                    <module name="TreeWalker">
+                      <property name="cacheFile" value="target/cachefile"></property>
+                      <property name="tabWidth" value="4"></property>
+                      <!-- Checks for Javadoc comments. -->
+                      <module name="JavadocStyle"></module>
+                      <!-- TODO: Enable NonEmptyAtclauseDescription after https://github.com/checkstyle/checkstyle/issues/1064 is fixed -->
+                      <!--<module name="NonEmptyAtclauseDescription"/>-->
+                      <!-- Checks for imports. -->
+                      <!--<module name="UnusedImports"/>-->
+                      <module name="RedundantImport"></module>
+                      <!-- defaults to sun.* packages -->
+                      <module name="IllegalImport"></module>
+                      <!-- Checks for size violations. -->
+                      <!--<module name="LineLength">-->
+                      <!--<property name="max" value="120"/>-->
+                      <!--</module>-->
+                      <module name="ParameterNumber"></module>
+                      <!-- Checks for whitespace. -->
+                      <module name="GenericWhitespace"></module>
+                      <module name="MethodParamPad"></module>
+                      <module name="NoWhitespaceBefore"></module>
+                      <module name="ParenPad"></module>
+                      <module name="TypecastParenPad"></module>
+                      <module name="WhitespaceAfter"></module>
+                      <!-- TODO: Enable the WhitespaceAround once checkstyle supports allowEmptyBlocks -->
+                      <!--<module name="WhitespaceAround">-->
+                        <!--<property name="allowEmptyConstructors" value="true"/>-->
+                        <!--<property name="allowEmptyTypes" value="true"/>-->
+                        <!--<property name="allowEmptyBlocks" value="true"/>-->
+                      <!--</module>-->
+                      <!-- Checks for blocks. -->
+                      <module name="LeftCurly"></module>
+                      <module name="NeedBraces"></module>
+                      <module name="RightCurly"></module>
+                      <!-- Checks for common coding problems. -->
+                      <module name="EmptyStatement"></module>
+                      <module name="EqualsHashCode"></module>
+                      <module name="IllegalInstantiation"></module>
+                      <module name="InnerAssignment"></module>
+                      <module name="OneStatementPerLine"></module>
+                      <!-- Checks for class design. -->
+                      <!--<module name="HideUtilityClassConstructor"/>-->
+                      <module name="InterfaceIsType"></module>
+                      <!-- Miscellaneous other checks. -->
+                      <module name="ArrayTypeStyle"></module>
+                      <module name="UpperEll"></module>
+                    </module>
+                  </module>
+                </checkstyleRules>
+                <consoleOutput>true</consoleOutput>
+                <logViolationsToConsole>true</logViolationsToConsole>
+                <failOnViolation>true</failOnViolation>
+                <failsOnError>true</failsOnError>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>project-sources-maven-plugin</artifactId>
+        <version>0.3</version>
+        <executions>
+          <execution>
+            <id>project-sources-archive</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>archive</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+<!--
+Modified by POM Manipulation Extension for Maven 1.17 ( SHA: 89482a03 ) 
+-->
+
